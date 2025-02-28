@@ -26,7 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
         isMobile: false,
         mouseDown: false,
         hoverCells: [],
-        hasShownKeyboardHint: false
+        hasShownKeyboardHint: false,
+        audioPlayer: {
+            isPlaying: false,
+            isMuted: false,
+            volume: 0.7
+        }
     };
 
     // DOM Elements
@@ -50,7 +55,18 @@ document.addEventListener('DOMContentLoaded', () => {
         bucketDropZones: document.querySelectorAll('.bucket-drop-zone'),
         bucketProgress: document.querySelectorAll('[id^="bucket-"][id$="-progress"]'),
         hexCode1: document.getElementById('hex-code-1'),
-        hexCode2: document.getElementById('hex-code-2')
+        hexCode2: document.getElementById('hex-code-2'),
+        // Music player elements
+        audioElement: document.getElementById('audio-player'),
+        playPauseBtn: document.getElementById('play-pause-btn'),
+        playIcon: document.querySelector('.play-icon'),
+        pauseIcon: document.querySelector('.pause-icon'),
+        progressBar: document.querySelector('.progress-bar'),
+        progressFill: document.getElementById('progress-fill'),
+        currentTimeDisplay: document.getElementById('current-time'),
+        durationDisplay: document.getElementById('duration'),
+        muteBtn: document.getElementById('mute-btn'),
+        volumeSlider: document.getElementById('volume-slider')
     };
 
     // Initialize the application
@@ -78,6 +94,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Debug log
         console.log('App initialized');
         console.log('File buttons found:', elements.fileButtons.length);
+        
+        // Initialize music player
+        initMusicPlayer();
+        
+        // Show the active screen
+        showScreen(state.currentScreen);
     }
     
     function detectMobile() {
@@ -780,5 +802,125 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 300);
         }
+    }
+
+    // Initialize the music player
+    function initMusicPlayer() {
+        // Set initial volume
+        elements.audioElement.volume = state.audioPlayer.volume;
+        elements.volumeSlider.value = state.audioPlayer.volume * 100;
+
+        // Handle audio error (file not found or cannot be played)
+        elements.audioElement.addEventListener('error', () => {
+            const audioStatus = document.querySelector('.audio-status');
+            if (audioStatus) {
+                audioStatus.textContent = 'Error loading audio file. See audio/README.md for instructions.';
+                audioStatus.style.color = 'rgba(255, 100, 100, 0.8)';
+            }
+            
+            // Disable play button
+            elements.playPauseBtn.disabled = true;
+            elements.playPauseBtn.style.opacity = '0.5';
+            elements.playPauseBtn.style.cursor = 'not-allowed';
+        });
+
+        // Update duration display when metadata is loaded
+        elements.audioElement.addEventListener('loadedmetadata', () => {
+            elements.durationDisplay.textContent = formatTime(elements.audioElement.duration);
+            
+            // Hide the status message when audio is successfully loaded
+            const audioStatus = document.querySelector('.audio-status');
+            if (audioStatus) {
+                audioStatus.style.display = 'none';
+            }
+        });
+
+        // Update current time display and progress bar during playback
+        elements.audioElement.addEventListener('timeupdate', () => {
+            const currentTime = elements.audioElement.currentTime;
+            const duration = elements.audioElement.duration || 0;
+            const progressPercent = (currentTime / duration) * 100;
+            
+            elements.progressFill.style.width = `${progressPercent}%`;
+            elements.currentTimeDisplay.textContent = formatTime(currentTime);
+        });
+
+        // Handle play/pause button click
+        elements.playPauseBtn.addEventListener('click', togglePlayPause);
+
+        // Handle progress bar click to seek
+        elements.progressBar.addEventListener('click', (e) => {
+            const progressBar = elements.progressBar;
+            const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
+            const progressBarWidth = progressBar.offsetWidth;
+            const seekTime = (clickPosition / progressBarWidth) * elements.audioElement.duration;
+            
+            elements.audioElement.currentTime = seekTime;
+        });
+
+        // Handle mute button click
+        elements.muteBtn.addEventListener('click', toggleMute);
+
+        // Handle volume slider change
+        elements.volumeSlider.addEventListener('input', (e) => {
+            const volume = e.target.value / 100;
+            elements.audioElement.volume = volume;
+            state.audioPlayer.volume = volume;
+            
+            // Update mute button icon based on volume
+            updateMuteButtonIcon(volume);
+        });
+
+        // Handle audio ended event
+        elements.audioElement.addEventListener('ended', () => {
+            // Reset play/pause button to play state
+            elements.playIcon.style.display = 'block';
+            elements.pauseIcon.style.display = 'none';
+            state.audioPlayer.isPlaying = false;
+            
+            // Restart the audio
+            elements.audioElement.currentTime = 0;
+        });
+    }
+
+    // Toggle play/pause
+    function togglePlayPause() {
+        if (state.audioPlayer.isPlaying) {
+            elements.audioElement.pause();
+            elements.playIcon.style.display = 'block';
+            elements.pauseIcon.style.display = 'none';
+        } else {
+            elements.audioElement.play();
+            elements.playIcon.style.display = 'none';
+            elements.pauseIcon.style.display = 'block';
+        }
+        
+        state.audioPlayer.isPlaying = !state.audioPlayer.isPlaying;
+    }
+
+    // Toggle mute
+    function toggleMute() {
+        state.audioPlayer.isMuted = !state.audioPlayer.isMuted;
+        elements.audioElement.muted = state.audioPlayer.isMuted;
+        
+        updateMuteButtonIcon(state.audioPlayer.isMuted ? 0 : state.audioPlayer.volume);
+    }
+
+    // Update mute button icon based on volume
+    function updateMuteButtonIcon(volume) {
+        if (volume === 0 || state.audioPlayer.isMuted) {
+            elements.muteBtn.textContent = '🔇';
+        } else if (volume < 0.5) {
+            elements.muteBtn.textContent = '🔉';
+        } else {
+            elements.muteBtn.textContent = '🔊';
+        }
+    }
+
+    // Format time in seconds to MM:SS format
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
     }
 }); 

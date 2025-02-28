@@ -21,7 +21,7 @@
         </div>
 
         <!-- Screen 1: Branch Selection -->
-        <div id="branch-screen" class="screen">
+        <div id="branch-screen" class="screen active">
             <div class="header-text">Select your branch country</div>
             <div class="grid-container">
                 <button class="grid-button" data-country="USA">USA</button>
@@ -58,7 +58,7 @@
         <!-- Screen 3: Number Grid -->
         <div id="grid-screen" class="screen">
             <div class="status-bar">
-                <div class="user-name" id="display-user-name"></div>
+                <div class="user-name" id="display-user-name">Siena</div>
                 <div class="progress-info">
                     <div id="current-file">File: </div>
                     <div id="total-progress">0% Complete</div>
@@ -66,6 +66,7 @@
                         <span id="hex-code-1">x137056</span> : <span id="hex-code-2">x09832E</span>
                     </div>
                 </div>
+                <div class="company-name">LUMON</div>
             </div>
 
             <div class="grid-border-line"></div>
@@ -98,6 +99,35 @@
                     <div class="bucket-drop-zone" id="bucket-5"></div>
                     <div class="bucket-progress" id="bucket-5-progress">0%</div>
                 </div>
+            </div>
+            
+            <!-- Music Player -->
+            <div class="music-player">
+                <div class="music-player-title">Severance Theme</div>
+                <div class="music-player-controls">
+                    <button id="play-pause-btn" class="player-btn">
+                        <span class="play-icon">▶</span>
+                        <span class="pause-icon" style="display:none;">❚❚</span>
+                    </button>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div id="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span id="current-time">0:00</span> / <span id="duration">0:00</span>
+                        </div>
+                    </div>
+                    <div class="volume-control">
+                        <button id="mute-btn" class="player-btn">🔊</button>
+                        <input type="range" id="volume-slider" min="0" max="100" value="70">
+                    </div>
+                </div>
+                <audio id="audio-player" preload="metadata">
+                    <source src="audio/severance-theme.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element or the audio file is missing.
+                    Please download the audio file as described in the audio/README.md file.
+                </audio>
+                <div class="audio-status">Audio file not loaded. See audio/README.md for instructions.</div>
             </div>
         </div>
     </div>

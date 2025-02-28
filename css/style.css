@@ -514,4 +514,178 @@ body {
 
 .bucket-drop-zone.highlight {
     animation: bucket-highlight-pulse 0.3s ease;
+}
+
+/* Music Player Styles */
+.music-player {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 280px;
+    background-color: rgba(0, 24, 36, 0.8);
+    border: 2px solid #00c3ff;
+    border-radius: 8px;
+    box-shadow: 0 0 15px #00c3ff, inset 0 0 5px #00c3ff;
+    padding: 15px;
+    z-index: 100;
+    animation: pulse 4s infinite alternate;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.music-player-title {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 10px;
+    text-shadow: 0 0 5px #00c3ff;
+    letter-spacing: 1px;
+}
+
+.music-player-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.player-btn {
+    background-color: transparent;
+    border: 1px solid #00c3ff;
+    color: #00c3ff;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 8px #00c3ff;
+    transition: all 0.3s ease;
+}
+
+.player-btn:hover {
+    background-color: rgba(0, 195, 255, 0.2);
+    box-shadow: 0 0 12px #00c3ff;
+}
+
+.player-btn:active {
+    transform: scale(0.95);
+}
+
+.progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-grow: 1;
+}
+
+.progress-bar {
+    height: 6px;
+    background-color: rgba(0, 195, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 195, 255, 0.5);
+}
+
+#progress-fill {
+    height: 100%;
+    background-color: #00c3ff;
+    width: 0%;
+    border-radius: 3px;
+    box-shadow: 0 0 8px #00c3ff;
+    transition: width 0.1s linear;
+}
+
+.time-display {
+    font-size: 0.8rem;
+    text-align: right;
+    color: #00c3ff;
+    text-shadow: 0 0 3px #00c3ff;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: rgba(0, 195, 255, 0.3);
+    border-radius: 2px;
+    flex-grow: 1;
+    box-shadow: 0 0 5px rgba(0, 195, 255, 0.5);
+}
+
+#volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: #00c3ff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px #00c3ff;
+}
+
+#volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: #00c3ff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px #00c3ff;
+    border: none;
+}
+
+.music-player-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Company name in status bar */
+.company-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px #00c3ff;
+    letter-spacing: 2px;
+}
+
+/* Make the music player responsive */
+@media (max-width: 768px) {
+    .music-player {
+        position: fixed;
+        top: auto;
+        bottom: 20px;
+        right: 20px;
+        width: 220px;
+    }
+    
+    .music-player-title {
+        font-size: 1rem;
+    }
+    
+    .player-btn {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Hide music player on non-grid screens */
+.screen:not(#grid-screen) .music-player {
+    display: none;
+}
+
+.audio-status {
+    font-size: 0.8rem;
+    color: rgba(0, 195, 255, 0.7);
+    text-align: center;
+    margin-top: 10px;
+    font-style: italic;
 } 
