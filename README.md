@@ -17,6 +17,7 @@ You can try the live demo here: [Macro Data Refinement Simulator](https://userna
 - **Group Selection**: When 9 numbers are selected, they can be dragged as a group
 - **Progress Tracking**: Watch as your refinement work increases the completion percentage
 - **Visual Effects**: Enjoy the glowing, pulsing interface with slow, deliberate animations that mimic the show
+- **Mobile Responsive**: Fully responsive design that works on desktop and mobile devices with touch support
 
 ## How to Use
 
@@ -41,6 +42,15 @@ For a more authentic experience, you can use the included Node.js server:
 3. Navigate to the project directory: `cd macrorefinement`
 4. Run the command: `node server.js`
 5. Open your browser and navigate to `http://localhost:3000`
+
+## Mobile Usage
+
+The application is fully responsive and works on mobile devices:
+
+- **Touch Support**: All interactions work with touch gestures
+- **Drag and Drop**: Select numbers and drag them to buckets using touch
+- **Responsive Layout**: The interface adapts to different screen sizes
+- **Portrait and Landscape**: Works in both orientations
 
 ## Deployment
 

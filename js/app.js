@@ -17,7 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
             current1: 'x00000',
             current2: 'x00006'
         },
-        selectionGroupActive: false
+        selectionGroupActive: false,
+        isDragging: false,
+        touchIdentifier: null,
+        dragOffsetX: 0,
+        dragOffsetY: 0
     };
 
     // DOM Elements
@@ -52,6 +56,19 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Start hex code animation
         startHexCodeAnimation();
+        
+        // Ensure viewport meta tag is set for mobile
+        ensureViewportMeta();
+    }
+    
+    function ensureViewportMeta() {
+        // Add viewport meta tag for mobile if not present
+        if (!document.querySelector('meta[name="viewport"]')) {
+            const meta = document.createElement('meta');
+            meta.name = 'viewport';
+            meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+            document.head.appendChild(meta);
+        }
     }
 
     function addEventListeners() {
@@ -62,6 +79,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 navigateToScreen('file-screen');
                 playSelectSound();
             });
+            
+            // Add touch event for mobile
+            button.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Prevent double-firing with click
+                state.selectedCountry = button.dataset.country;
+                navigateToScreen('file-screen');
+                playSelectSound();
+            }, { passive: false });
         });
 
         // File selection
@@ -73,6 +98,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 generateNumberGrid();
                 playSelectSound();
             });
+            
+            // Add touch event for mobile
+            button.addEventListener('touchstart', (e) => {
+                e.preventDefault(); // Prevent double-firing with click
+                state.selectedFile = button.dataset.file;
+                elements.currentFile.textContent = state.selectedFile;
+                navigateToScreen('grid-screen');
+                generateNumberGrid();
+                playSelectSound();
+            }, { passive: false });
         });
 
         // Bucket drop zones
@@ -80,7 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
             zone.addEventListener('dragover', handleDragOver);
             zone.addEventListener('dragleave', handleDragLeave);
             zone.addEventListener('drop', handleDrop);
+            
+            // Add touch events for mobile
+            zone.addEventListener('touchmove', (e) => {
+                e.preventDefault(); // Prevent scrolling when over drop zones
+                handleTouchMove(e, zone);
+            }, { passive: false });
         });
+        
+        // Add document-level touch event listeners for dragging
+        document.addEventListener('touchmove', handleDocumentTouchMove, { passive: false });
+        document.addEventListener('touchend', handleDocumentTouchEnd);
+        document.addEventListener('touchcancel', handleDocumentTouchEnd);
     }
 
     function navigateToScreen(screenId) {
@@ -116,6 +162,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 cell.addEventListener('click', () => {
                     handleNumberSelection(cell);
                 });
+                
+                // Add touch event for mobile
+                cell.addEventListener('touchstart', (e) => {
+                    // Only prevent default if we're not scrolling
+                    if (state.currentScreen === 'grid-screen') {
+                        e.preventDefault();
+                    }
+                    handleNumberSelection(cell);
+                }, { passive: false });
 
                 // Add hover sound effect
                 cell.addEventListener('mouseenter', () => {
@@ -146,6 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add drag events
         selectionGroup.addEventListener('dragstart', handleSelectionGroupDragStart);
         selectionGroup.addEventListener('dragend', handleSelectionGroupDragEnd);
+        
+        // Add touch events for mobile
+        selectionGroup.addEventListener('touchstart', handleSelectionGroupTouchStart, { passive: false });
 
         elements.numberGrid.appendChild(selectionGroup);
     }
@@ -216,6 +274,10 @@ document.addEventListener('DOMContentLoaded', () => {
             selectionGroup.style.width = `${maxRight - minLeft + 20}px`;
             selectionGroup.style.height = `${maxBottom - minTop + 20}px`;
             
+            // Store original position for touch dragging
+            selectionGroup.dataset.originalLeft = selectionGroup.style.left;
+            selectionGroup.dataset.originalTop = selectionGroup.style.top;
+            
             // Activate the selection group
             selectionGroup.classList.add('active');
             state.selectionGroupActive = true;
@@ -238,6 +300,148 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleSelectionGroupDragEnd(e) {
         e.target.classList.remove('dragging');
     }
+    
+    // Touch event handlers for mobile
+    function handleSelectionGroupTouchStart(e) {
+        if (state.selectedNumbers.length !== 9 || !e.target.classList.contains('active')) return;
+        
+        e.preventDefault(); // Prevent default touch behavior
+        
+        state.isDragging = true;
+        state.touchIdentifier = e.changedTouches[0].identifier;
+        
+        const touch = e.changedTouches[0];
+        const rect = e.target.getBoundingClientRect();
+        
+        // Calculate the offset of the touch point from the top-left corner of the element
+        state.dragOffsetX = touch.clientX - rect.left;
+        state.dragOffsetY = touch.clientY - rect.top;
+        
+        e.target.classList.add('dragging');
+        playDragSound();
+    }
+    
+    function handleDocumentTouchMove(e) {
+        if (!state.isDragging) return;
+        
+        // Find the touch that started the drag
+        let touch = null;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === state.touchIdentifier) {
+                touch = e.changedTouches[i];
+                break;
+            }
+        }
+        
+        if (!touch) return;
+        
+        // Prevent default only when we're actually dragging
+        e.preventDefault();
+        
+        const selectionGroup = document.getElementById('selection-group');
+        if (!selectionGroup || !selectionGroup.classList.contains('dragging')) return;
+        
+        const gridRect = elements.numberGrid.getBoundingClientRect();
+        
+        // Update position based on touch movement
+        selectionGroup.style.left = `${touch.clientX - gridRect.left - state.dragOffsetX}px`;
+        selectionGroup.style.top = `${touch.clientY - gridRect.top - state.dragOffsetY}px`;
+        
+        // Check if over a drop zone
+        checkDropZones(touch.clientX, touch.clientY);
+    }
+    
+    function handleDocumentTouchEnd(e) {
+        if (!state.isDragging) return;
+        
+        // Find the touch that started the drag
+        let touch = null;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === state.touchIdentifier) {
+                touch = e.changedTouches[i];
+                break;
+            }
+        }
+        
+        if (!touch) return;
+        
+        const selectionGroup = document.getElementById('selection-group');
+        if (!selectionGroup) return;
+        
+        selectionGroup.classList.remove('dragging');
+        
+        // Check if dropped on a drop zone
+        const dropZone = checkDropZones(touch.clientX, touch.clientY);
+        if (dropZone) {
+            const bucketId = dropZone.id.split('-')[1];
+            processDrop(bucketId);
+        } else {
+            // Reset position if not dropped on a valid zone
+            resetSelectionGroupPosition(selectionGroup);
+        }
+        
+        // Reset drag state
+        state.isDragging = false;
+        state.touchIdentifier = null;
+    }
+    
+    function handleTouchMove(e, zone) {
+        if (!state.isDragging) return;
+        
+        // Find the touch that started the drag
+        let touch = null;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === state.touchIdentifier) {
+                touch = e.changedTouches[i];
+                break;
+            }
+        }
+        
+        if (!touch) return;
+        
+        const rect = zone.getBoundingClientRect();
+        if (
+            touch.clientX >= rect.left && 
+            touch.clientX <= rect.right && 
+            touch.clientY >= rect.top && 
+            touch.clientY <= rect.bottom
+        ) {
+            zone.classList.add('highlight');
+        } else {
+            zone.classList.remove('highlight');
+        }
+    }
+    
+    function resetSelectionGroupPosition(selectionGroup) {
+        // Reset to original position
+        if (selectionGroup.dataset.originalLeft && selectionGroup.dataset.originalTop) {
+            selectionGroup.style.left = selectionGroup.dataset.originalLeft;
+            selectionGroup.style.top = selectionGroup.dataset.originalTop;
+        }
+    }
+    
+    function checkDropZones(x, y) {
+        let activeDropZone = null;
+        
+        // Remove highlight from all drop zones
+        elements.bucketDropZones.forEach(zone => {
+            zone.classList.remove('highlight');
+            
+            // Check if coordinates are over this drop zone
+            const rect = zone.getBoundingClientRect();
+            if (
+                x >= rect.left && 
+                x <= rect.right && 
+                y >= rect.top && 
+                y <= rect.bottom
+            ) {
+                zone.classList.add('highlight');
+                activeDropZone = zone;
+            }
+        });
+        
+        return activeDropZone;
+    }
 
     function handleDragOver(e) {
         e.preventDefault();
@@ -257,34 +461,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Only process if we have 9 numbers selected and the selection group is being dragged
         if (state.selectedNumbers.length === 9 && data === 'selection-group') {
-            // Add numbers to the bucket
-            state.buckets[bucketId].numbers = state.buckets[bucketId].numbers.concat(state.selectedNumbers);
-            
-            // Update bucket progress (random increase between 1-5%)
-            const progressIncrease = Math.floor(Math.random() * 5) + 1;
-            state.buckets[bucketId].progress += progressIncrease;
-            
-            // Update total progress
-            state.totalProgress += Math.floor(progressIncrease / 5);
-            
-            // Clear selected numbers
-            state.selectedNumbers.forEach(num => {
-                num.element.classList.remove('selected');
-            });
-            state.selectedNumbers = [];
-            
-            // Update UI
-            updateUI();
-            
-            // Play success sound
-            playSuccessSound();
-            
-            // Flash the screen briefly
-            flashScreen();
-            
-            // Update selection group
-            updateSelectionGroup();
+            processDrop(bucketId);
         }
+    }
+    
+    function processDrop(bucketId) {
+        // Add numbers to the bucket
+        state.buckets[bucketId].numbers = state.buckets[bucketId].numbers.concat(state.selectedNumbers);
+        
+        // Update bucket progress (random increase between 1-5%)
+        const progressIncrease = Math.floor(Math.random() * 5) + 1;
+        state.buckets[bucketId].progress += progressIncrease;
+        
+        // Update total progress
+        state.totalProgress += Math.floor(progressIncrease / 5);
+        
+        // Clear selected numbers
+        state.selectedNumbers.forEach(num => {
+            num.element.classList.remove('selected');
+        });
+        state.selectedNumbers = [];
+        
+        // Update UI
+        updateUI();
+        
+        // Play success sound
+        playSuccessSound();
+        
+        // Flash the screen briefly
+        flashScreen();
+        
+        // Update selection group
+        updateSelectionGroup();
     }
 
     function updateUI() {
