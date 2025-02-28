@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Application state
     const state = {
-        currentScreen: 'name-screen',
-        userName: '',
+        currentScreen: 'branch-screen',
+        userName: 'Refinement Worker',
         selectedCountry: null,
         selectedFile: null,
         selectedNumbers: [],
@@ -96,6 +96,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize hasShownKeyboardHint flag
         state.hasShownKeyboardHint = false;
         
+        // Set default username in display
+        elements.userNameDisplay.textContent = state.userName;
+        
         // Debug log
         console.log('App initialized');
         console.log('File buttons found:', elements.fileButtons.length);
@@ -123,17 +126,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addEventListeners() {
-        // Name submission
-        elements.nameSubmit.addEventListener('click', () => {
-            handleNameSubmit();
-        });
-        
-        // Allow pressing Enter to submit name
-        elements.nameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
+        // Name submission - keeping this code but it won't be used
+        if (elements.nameSubmit) {
+            elements.nameSubmit.addEventListener('click', () => {
                 handleNameSubmit();
+            });
+            
+            // Allow pressing Enter to submit name
+            if (elements.nameInput) {
+                elements.nameInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleNameSubmit();
+                    }
+                });
             }
-        });
+        }
 
         // Country selection
         elements.countryButtons.forEach(button => {
