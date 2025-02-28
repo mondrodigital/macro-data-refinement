@@ -1,0 +1,29 @@
+{
+  "name": "macro-data-refinement-simulator",
+  "version": "1.0.0",
+  "description": "A web application that simulates the macro data refinement work from the TV show Severance",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "severance",
+    "macro",
+    "data",
+    "refinement",
+    "simulator",
+    "web",
+    "app"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/username/macrorefinement.git"
+  },
+  "bugs": {
+    "url": "https://github.com/username/macrorefinement/issues"
+  },
+  "homepage": "https://github.com/username/macrorefinement#readme"
+} 
