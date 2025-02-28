@@ -11,8 +11,17 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Screen 0: Name Input -->
+        <div id="name-screen" class="screen active">
+            <div class="header-text">Enter your name</div>
+            <div class="name-input-container">
+                <input type="text" id="user-name-input" class="name-input" placeholder="Your name" maxlength="15">
+                <button id="submit-name-btn" class="submit-name-btn">Begin</button>
+            </div>
+        </div>
+
         <!-- Screen 1: Branch Selection -->
-        <div id="branch-screen" class="screen active">
+        <div id="branch-screen" class="screen">
             <div class="header-text">Select your branch country</div>
             <div class="grid-container">
                 <button class="grid-button" data-country="USA">USA</button>
@@ -49,41 +58,45 @@
         <!-- Screen 3: Number Grid -->
         <div id="grid-screen" class="screen">
             <div class="status-bar">
-                <div id="current-file">PiGmy</div>
-                <div class="hex-codes">
-                    <span id="hex-code-1">x00000</span>
-                    <span id="hex-code-2">x00006</span>
+                <div class="user-name" id="display-user-name"></div>
+                <div class="progress-info">
+                    <div id="current-file">File: </div>
+                    <div id="total-progress">0% Complete</div>
+                    <div class="hex-codes">
+                        <span id="hex-code-1">x137056</span> : <span id="hex-code-2">x09832E</span>
+                    </div>
                 </div>
-                <div id="total-progress">3% Complete</div>
             </div>
 
+            <div class="grid-border-line"></div>
             <div id="number-grid" class="number-grid"></div>
+            <div class="grid-border-line"></div>
 
             <div class="buckets">
                 <div class="bucket" data-bucket="1">
                     <div class="bucket-label">01</div>
-                    <div class="bucket-progress" id="bucket-1-progress">1%</div>
                     <div class="bucket-drop-zone" id="bucket-1"></div>
+                    <div class="bucket-progress" id="bucket-1-progress">0%</div>
                 </div>
                 <div class="bucket" data-bucket="2">
                     <div class="bucket-label">02</div>
-                    <div class="bucket-progress" id="bucket-2-progress">5%</div>
                     <div class="bucket-drop-zone" id="bucket-2"></div>
+                    <div class="bucket-progress" id="bucket-2-progress">0%</div>
                 </div>
                 <div class="bucket" data-bucket="3">
                     <div class="bucket-label">03</div>
-                    <div class="bucket-progress" id="bucket-3-progress">0%</div>
                     <div class="bucket-drop-zone" id="bucket-3"></div>
+                    <div class="bucket-progress" id="bucket-3-progress">0%</div>
                 </div>
                 <div class="bucket" data-bucket="4">
                     <div class="bucket-label">04</div>
-                    <div class="bucket-progress" id="bucket-4-progress">0%</div>
                     <div class="bucket-drop-zone" id="bucket-4"></div>
+                    <div class="bucket-progress" id="bucket-4-progress">0%</div>
                 </div>
                 <div class="bucket" data-bucket="5">
                     <div class="bucket-label">05</div>
-                    <div class="bucket-progress" id="bucket-5-progress">3%</div>
                     <div class="bucket-drop-zone" id="bucket-5"></div>
+                    <div class="bucket-progress" id="bucket-5-progress">0%</div>
                 </div>
             </div>
         </div>

@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Application state
     const state = {
-        currentScreen: 'branch-screen',
+        currentScreen: 'name-screen',
+        userName: '',
         selectedCountry: null,
         selectedFile: null,
         selectedNumbers: [],
@@ -24,17 +25,22 @@ document.addEventListener('DOMContentLoaded', () => {
         dragOffsetY: 0,
         isMobile: false,
         mouseDown: false,
-        hoverCells: []
+        hoverCells: [],
+        hasShownKeyboardHint: false
     };
 
     // DOM Elements
     const screens = {
+        name: document.getElementById('name-screen'),
         branch: document.getElementById('branch-screen'),
         file: document.getElementById('file-screen'),
         grid: document.getElementById('grid-screen')
     };
 
     const elements = {
+        nameInput: document.getElementById('user-name-input'),
+        nameSubmit: document.getElementById('submit-name-btn'),
+        userNameDisplay: document.getElementById('display-user-name'),
         countryButtons: document.querySelectorAll('[data-country]'),
         fileButtons: document.querySelectorAll('[data-file]'),
         numberGrid: document.getElementById('number-grid'),
@@ -65,6 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Ensure viewport meta tag is set for mobile
         ensureViewportMeta();
+        
+        // Initialize hasShownKeyboardHint flag
+        state.hasShownKeyboardHint = false;
+        
+        // Debug log
+        console.log('App initialized');
+        console.log('File buttons found:', elements.fileButtons.length);
     }
     
     function detectMobile() {
@@ -83,12 +96,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addEventListeners() {
+        // Name submission
+        elements.nameSubmit.addEventListener('click', () => {
+            handleNameSubmit();
+        });
+        
+        // Allow pressing Enter to submit name
+        elements.nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleNameSubmit();
+            }
+        });
+
         // Country selection
         elements.countryButtons.forEach(button => {
             button.addEventListener('click', () => {
                 state.selectedCountry = button.dataset.country;
                 navigateToScreen('file-screen');
                 playSelectSound();
+                console.log('Country selected:', state.selectedCountry);
             });
             
             // Add touch event for mobile
@@ -97,14 +123,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.selectedCountry = button.dataset.country;
                 navigateToScreen('file-screen');
                 playSelectSound();
+                console.log('Country selected (touch):', state.selectedCountry);
             }, { passive: false });
         });
 
         // File selection
-        elements.fileButtons.forEach(button => {
+        console.log('Setting up file button listeners');
+        elements.fileButtons.forEach((button, index) => {
+            console.log(`Setting up listener for file button ${index}:`, button.dataset.file);
+            
             button.addEventListener('click', () => {
+                console.log('File button clicked:', button.dataset.file);
                 state.selectedFile = button.dataset.file;
-                elements.currentFile.textContent = state.selectedFile;
+                
+                // Check if currentFile element exists
+                if (elements.currentFile) {
+                    elements.currentFile.textContent = state.selectedFile;
+                } else {
+                    console.error('Current file element not found');
+                }
+                
                 navigateToScreen('grid-screen');
                 generateNumberGrid();
                 playSelectSound();
@@ -113,8 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add touch event for mobile
             button.addEventListener('touchstart', (e) => {
                 e.preventDefault(); // Prevent double-firing with click
+                console.log('File button touched:', button.dataset.file);
                 state.selectedFile = button.dataset.file;
-                elements.currentFile.textContent = state.selectedFile;
+                
+                // Check if currentFile element exists
+                if (elements.currentFile) {
+                    elements.currentFile.textContent = state.selectedFile;
+                } else {
+                    console.error('Current file element not found');
+                }
+                
                 navigateToScreen('grid-screen');
                 generateNumberGrid();
                 playSelectSound();
@@ -144,6 +190,29 @@ document.addEventListener('DOMContentLoaded', () => {
             document.addEventListener('mousedown', handleDocumentMouseDown);
             document.addEventListener('mouseup', handleDocumentMouseUp);
             document.addEventListener('mousemove', handleDocumentMouseMove);
+            
+            // Add mousemove event to the number grid for the magnifying glass effect
+            elements.numberGrid.addEventListener('mousemove', handleNumberGridMouseMove);
+            elements.numberGrid.addEventListener('mouseleave', handleNumberGridMouseLeave);
+        }
+        
+        // Add keyboard event listener for number keys to select buckets
+        document.addEventListener('keydown', handleKeyDown);
+    }
+
+    function handleNameSubmit() {
+        const nameInput = elements.nameInput.value.trim();
+        if (nameInput) {
+            state.userName = nameInput;
+            elements.userNameDisplay.textContent = state.userName;
+            navigateToScreen('branch-screen');
+            playSelectSound();
+        } else {
+            // Shake the input field to indicate error
+            elements.nameInput.classList.add('shake');
+            setTimeout(() => {
+                elements.nameInput.classList.remove('shake');
+            }, 500);
         }
     }
 
@@ -192,7 +261,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         handleNumberSelection(cell);
                     }, { passive: false });
                 } else {
-                    // Desktop: Use hover and drag to select
+                    // Desktop: Use click to select and hover for magnifying effect
+                    cell.addEventListener('click', () => {
+                        handleNumberSelection(cell);
+                    });
+                    
+                    // Add hover effect for magnifying glass
                     cell.addEventListener('mouseenter', () => {
                         handleNumberHover(cell);
                         playHoverSound();
@@ -209,8 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Create selection group element
-        createSelectionGroup();
+        // Clear selected numbers
+        state.selectedNumbers = [];
     }
     
     function setWiggleProperties(cell) {
@@ -233,141 +307,125 @@ document.addEventListener('DOMContentLoaded', () => {
             cell.style.setProperty('--wiggle-y4', `${wiggleAmount/2}px`);
         }
     }
-
-    function createSelectionGroup() {
-        // Remove any existing selection group
-        const existingGroup = document.querySelector('.selection-group');
-        if (existingGroup) {
-            existingGroup.remove();
-        }
-
-        // Create new selection group
-        const selectionGroup = document.createElement('div');
-        selectionGroup.className = 'selection-group';
-        selectionGroup.id = 'selection-group';
-        selectionGroup.draggable = true;
-
-        // Add drag events
-        selectionGroup.addEventListener('dragstart', handleSelectionGroupDragStart);
-        selectionGroup.addEventListener('dragend', handleSelectionGroupDragEnd);
-        
-        // Add touch events for mobile
-        selectionGroup.addEventListener('touchstart', handleSelectionGroupTouchStart, { passive: false });
-
-        elements.numberGrid.appendChild(selectionGroup);
-    }
     
     // Desktop mouse event handlers
     function handleDocumentMouseDown(e) {
         if (state.currentScreen !== 'grid-screen') return;
         
         state.mouseDown = true;
-        
-        // If we have hovered cells, select them
-        state.hoverCells.forEach(cell => {
-            if (!cell.classList.contains('selected')) {
-                handleNumberSelection(cell);
-            }
-        });
     }
     
     function handleDocumentMouseUp(e) {
         if (state.currentScreen !== 'grid-screen') return;
         
         state.mouseDown = false;
-        
-        // Clear hover cells that aren't selected
-        state.hoverCells.forEach(cell => {
-            if (!cell.classList.contains('selected')) {
-                handleNumberUnhover(cell);
-            }
-        });
-        
-        state.hoverCells = [];
-        
-        // If we have 9 selected and we're dragging, check if we're over a bucket
-        if (state.selectedNumbers.length === 9 && state.isDragging) {
-            const dropZone = checkDropZones(e.clientX, e.clientY);
-            if (dropZone) {
-                const bucketId = dropZone.id.split('-')[1];
-                animateNumbersToBucket(state.selectedNumbers, bucketId);
-            } else {
-                // Reset position if not dropped on a valid zone
-                const selectionGroup = document.getElementById('selection-group');
-                if (selectionGroup) {
-                    resetSelectionGroupPosition(selectionGroup);
-                }
-            }
-            
-            state.isDragging = false;
-        }
     }
     
     function handleDocumentMouseMove(e) {
         if (state.currentScreen !== 'grid-screen' || !state.mouseDown) return;
         
-        // If we have 9 selected, start dragging
-        if (state.selectedNumbers.length === 9) {
-            if (!state.isDragging) {
-                state.isDragging = true;
-                const selectionGroup = document.getElementById('selection-group');
-                if (selectionGroup) {
-                    selectionGroup.classList.add('dragging');
-                    
-                    // Calculate drag offset
-                    const rect = selectionGroup.getBoundingClientRect();
-                    state.dragOffsetX = e.clientX - rect.left;
-                    state.dragOffsetY = e.clientY - rect.top;
-                    
-                    playDragSound();
-                }
-            }
-            
-            // Move the selection group
-            const selectionGroup = document.getElementById('selection-group');
-            if (selectionGroup && selectionGroup.classList.contains('dragging')) {
-                const gridRect = elements.numberGrid.getBoundingClientRect();
-                
-                selectionGroup.style.left = `${e.clientX - gridRect.left - state.dragOffsetX}px`;
-                selectionGroup.style.top = `${e.clientY - gridRect.top - state.dragOffsetY}px`;
-                
-                // Check if over a drop zone
-                checkDropZones(e.clientX, e.clientY);
+        // Check if mouse is over a number cell
+        const element = document.elementFromPoint(e.clientX, e.clientY);
+        if (element && element.classList.contains('number-cell')) {
+            // If we're dragging over a cell, select it
+            if (!element.classList.contains('selected')) {
+                handleNumberSelection(element);
             }
         }
+    }
+    
+    // Function to handle mouse movement over the number grid
+    function handleNumberGridMouseMove(e) {
+        if (state.currentScreen !== 'grid-screen') return;
+        
+        // Get mouse position relative to the grid
+        const gridRect = elements.numberGrid.getBoundingClientRect();
+        const mouseX = e.clientX - gridRect.left;
+        const mouseY = e.clientY - gridRect.top;
+        
+        // Get all cells in the grid
+        const allCells = elements.numberGrid.querySelectorAll('.number-cell');
+        
+        // Loop through all cells to apply magnifying effect based on distance to mouse
+        allCells.forEach(cell => {
+            if (cell.classList.contains('selected')) return;
+            
+            // Get cell position
+            const cellRect = cell.getBoundingClientRect();
+            const cellCenterX = cellRect.left + cellRect.width / 2 - gridRect.left;
+            const cellCenterY = cellRect.top + cellRect.height / 2 - gridRect.top;
+            
+            // Calculate distance from mouse to cell center
+            const distance = Math.sqrt(
+                Math.pow(mouseX - cellCenterX, 2) + 
+                Math.pow(mouseY - cellCenterY, 2)
+            );
+            
+            // Convert distance to grid cell units (approximate)
+            const cellSize = (cellRect.width + cellRect.height) / 2;
+            const distanceInCells = distance / cellSize;
+            
+            // Apply scale based on distance
+            if (distanceInCells < 0.5) {
+                // Main hover effect for the closest cell
+                cell.classList.add('hover-effect');
+                cell.classList.remove('ripple-effect-1');
+                cell.classList.remove('ripple-effect-2');
+            } else if (distanceInCells < 1.5) {
+                // First ripple effect for cells within 1.5 cell distance
+                cell.classList.remove('hover-effect');
+                cell.classList.add('ripple-effect-1');
+                cell.classList.remove('ripple-effect-2');
+                
+                // Calculate scale based on distance - closer cells get larger scale
+                const scale = 1.8 - ((distanceInCells - 0.5) / 1.0 * 0.6);
+                cell.style.setProperty('--dynamic-scale', `${scale.toFixed(2)}`);
+            } else if (distanceInCells < 2.0) {
+                // Second ripple effect for cells within 2.0 cell distance
+                cell.classList.remove('hover-effect');
+                cell.classList.remove('ripple-effect-1');
+                cell.classList.add('ripple-effect-2');
+                
+                // Calculate scale based on distance - further cells get smaller scale
+                const scale = 1.3 - ((distanceInCells - 1.5) / 0.5 * 0.2);
+                cell.style.setProperty('--dynamic-scale', `${scale.toFixed(2)}`);
+            } else {
+                // Remove all effects for cells beyond the threshold
+                cell.classList.remove('hover-effect');
+                cell.classList.remove('ripple-effect-1');
+                cell.classList.remove('ripple-effect-2');
+                cell.style.removeProperty('--dynamic-scale');
+            }
+        });
+    }
+    
+    // Function to handle mouse leaving the number grid
+    function handleNumberGridMouseLeave() {
+        if (state.currentScreen !== 'grid-screen') return;
+        
+        // Remove all hover effects when mouse leaves the grid
+        const allCells = elements.numberGrid.querySelectorAll('.number-cell');
+        allCells.forEach(cell => {
+            if (!cell.classList.contains('selected')) {
+                cell.classList.remove('hover-effect');
+                cell.classList.remove('ripple-effect-1');
+                cell.classList.remove('ripple-effect-2');
+                cell.style.removeProperty('--dynamic-scale');
+            }
+        });
     }
     
     function handleNumberHover(cell) {
-        // If already have 9 selections and this one isn't selected, don't allow more
-        if (state.selectedNumbers.length >= 9 && !cell.classList.contains('selected')) {
-            return;
-        }
+        // If already selected, don't apply hover effect
+        if (cell.classList.contains('selected')) return;
         
-        // Add hover effect
+        // Apply hover effect
         cell.classList.add('hover-effect');
-        
-        // Add to hover cells array if not already there
-        if (!state.hoverCells.includes(cell)) {
-            state.hoverCells.push(cell);
-        }
-        
-        // If mouse is down, select the cell
-        if (state.mouseDown && !cell.classList.contains('selected')) {
-            handleNumberSelection(cell);
-        }
     }
     
     function handleNumberUnhover(cell) {
-        // Remove hover effect if not selected
-        if (!cell.classList.contains('selected')) {
-            cell.classList.remove('hover-effect');
-            
-            // Remove from hover cells array
-            const index = state.hoverCells.indexOf(cell);
-            if (index !== -1) {
-                state.hoverCells.splice(index, 1);
-            }
-        }
+        // Remove hover effect
+        cell.classList.remove('hover-effect');
     }
 
     function handleNumberSelection(cell) {
@@ -379,7 +437,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Toggle selection
         if (cell.classList.contains('selected')) {
             cell.classList.remove('selected');
-            cell.classList.remove('hover-effect');
             
             // Remove from selected numbers
             const index = state.selectedNumbers.findIndex(n => 
@@ -408,206 +465,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update hex codes when selection changes
         updateHexCodes();
         
-        // Check if we have 9 selections to activate the selection group
+        // Check if we have 9 selections to show keyboard hint
         updateSelectionGroup();
     }
 
     function updateSelectionGroup() {
-        const selectionGroup = document.getElementById('selection-group');
-        
+        // Check if we have 9 numbers selected
         if (state.selectedNumbers.length === 9) {
-            // Calculate the bounding box of all selected numbers
-            const positions = state.selectedNumbers.map(num => {
-                const rect = num.element.getBoundingClientRect();
-                const gridRect = elements.numberGrid.getBoundingClientRect();
-                return {
-                    left: rect.left - gridRect.left,
-                    top: rect.top - gridRect.top,
-                    right: rect.right - gridRect.left,
-                    bottom: rect.bottom - gridRect.top
-                };
-            });
-            
-            const minLeft = Math.min(...positions.map(p => p.left));
-            const minTop = Math.min(...positions.map(p => p.top));
-            const maxRight = Math.max(...positions.map(p => p.right));
-            const maxBottom = Math.max(...positions.map(p => p.bottom));
-            
-            // Position and size the selection group
-            selectionGroup.style.left = `${minLeft - 10}px`;
-            selectionGroup.style.top = `${minTop - 10}px`;
-            selectionGroup.style.width = `${maxRight - minLeft + 20}px`;
-            selectionGroup.style.height = `${maxBottom - minTop + 20}px`;
-            
-            // Store original position for touch dragging
-            selectionGroup.dataset.originalLeft = selectionGroup.style.left;
-            selectionGroup.dataset.originalTop = selectionGroup.style.top;
-            
-            // Activate the selection group
-            selectionGroup.classList.add('active');
-            state.selectionGroupActive = true;
+            // Show keyboard shortcut hint if this is the first time
+            if (!state.hasShownKeyboardHint) {
+                showKeyboardShortcutHint();
+            }
         } else {
-            // Deactivate the selection group
-            selectionGroup.classList.remove('active');
-            selectionGroup.classList.remove('dragging');
-            state.selectionGroupActive = false;
-            state.isDragging = false;
+            // Hide keyboard shortcut hint
+            hideKeyboardShortcutHint();
         }
-    }
-
-    // Drag and Drop Handlers for Selection Group
-    function handleSelectionGroupDragStart(e) {
-        if (state.selectedNumbers.length !== 9) return;
-        
-        e.dataTransfer.setData('text/plain', 'selection-group');
-        e.target.classList.add('dragging');
-        playDragSound();
-    }
-
-    function handleSelectionGroupDragEnd(e) {
-        e.target.classList.remove('dragging');
-    }
-    
-    // Touch event handlers for mobile
-    function handleSelectionGroupTouchStart(e) {
-        if (state.selectedNumbers.length !== 9 || !e.target.classList.contains('active')) return;
-        
-        e.preventDefault(); // Prevent default touch behavior
-        
-        state.isDragging = true;
-        state.touchIdentifier = e.changedTouches[0].identifier;
-        
-        const touch = e.changedTouches[0];
-        const rect = e.target.getBoundingClientRect();
-        
-        // Calculate the offset of the touch point from the top-left corner of the element
-        state.dragOffsetX = touch.clientX - rect.left;
-        state.dragOffsetY = touch.clientY - rect.top;
-        
-        e.target.classList.add('dragging');
-        playDragSound();
-    }
-    
-    function handleDocumentTouchMove(e) {
-        if (!state.isDragging) return;
-        
-        // Find the touch that started the drag
-        let touch = null;
-        for (let i = 0; i < e.changedTouches.length; i++) {
-            if (e.changedTouches[i].identifier === state.touchIdentifier) {
-                touch = e.changedTouches[i];
-                break;
-            }
-        }
-        
-        if (!touch) return;
-        
-        // Prevent default only when we're actually dragging
-        e.preventDefault();
-        
-        const selectionGroup = document.getElementById('selection-group');
-        if (!selectionGroup || !selectionGroup.classList.contains('dragging')) return;
-        
-        const gridRect = elements.numberGrid.getBoundingClientRect();
-        
-        // Update position based on touch movement
-        selectionGroup.style.left = `${touch.clientX - gridRect.left - state.dragOffsetX}px`;
-        selectionGroup.style.top = `${touch.clientY - gridRect.top - state.dragOffsetY}px`;
-        
-        // Check if over a drop zone
-        checkDropZones(touch.clientX, touch.clientY);
-    }
-    
-    function handleDocumentTouchEnd(e) {
-        if (!state.isDragging) return;
-        
-        // Find the touch that started the drag
-        let touch = null;
-        for (let i = 0; i < e.changedTouches.length; i++) {
-            if (e.changedTouches[i].identifier === state.touchIdentifier) {
-                touch = e.changedTouches[i];
-                break;
-            }
-        }
-        
-        if (!touch) return;
-        
-        const selectionGroup = document.getElementById('selection-group');
-        if (!selectionGroup) return;
-        
-        selectionGroup.classList.remove('dragging');
-        
-        // Check if dropped on a drop zone
-        const dropZone = checkDropZones(touch.clientX, touch.clientY);
-        if (dropZone) {
-            const bucketId = dropZone.id.split('-')[1];
-            animateNumbersToBucket(state.selectedNumbers, bucketId);
-        } else {
-            // Reset position if not dropped on a valid zone
-            resetSelectionGroupPosition(selectionGroup);
-        }
-        
-        // Reset drag state
-        state.isDragging = false;
-        state.touchIdentifier = null;
-    }
-    
-    function handleTouchMove(e, zone) {
-        if (!state.isDragging) return;
-        
-        // Find the touch that started the drag
-        let touch = null;
-        for (let i = 0; i < e.changedTouches.length; i++) {
-            if (e.changedTouches[i].identifier === state.touchIdentifier) {
-                touch = e.changedTouches[i];
-                break;
-            }
-        }
-        
-        if (!touch) return;
-        
-        const rect = zone.getBoundingClientRect();
-        if (
-            touch.clientX >= rect.left && 
-            touch.clientX <= rect.right && 
-            touch.clientY >= rect.top && 
-            touch.clientY <= rect.bottom
-        ) {
-            zone.classList.add('highlight');
-        } else {
-            zone.classList.remove('highlight');
-        }
-    }
-    
-    function resetSelectionGroupPosition(selectionGroup) {
-        // Reset to original position
-        if (selectionGroup.dataset.originalLeft && selectionGroup.dataset.originalTop) {
-            selectionGroup.style.left = selectionGroup.dataset.originalLeft;
-            selectionGroup.style.top = selectionGroup.dataset.originalTop;
-        }
-    }
-    
-    function checkDropZones(x, y) {
-        let activeDropZone = null;
-        
-        // Remove highlight from all drop zones
-        elements.bucketDropZones.forEach(zone => {
-            zone.classList.remove('highlight');
-            
-            // Check if coordinates are over this drop zone
-            const rect = zone.getBoundingClientRect();
-            if (
-                x >= rect.left && 
-                x <= rect.right && 
-                y >= rect.top && 
-                y <= rect.bottom
-            ) {
-                zone.classList.add('highlight');
-                activeDropZone = zone;
-            }
-        });
-        
-        return activeDropZone;
     }
 
     function handleDragOver(e) {
@@ -626,10 +498,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = e.dataTransfer.getData('text/plain');
         const bucketId = e.target.id.split('-')[1];
 
-        // Only process if we have 9 numbers selected and the selection group is being dragged
-        if (state.selectedNumbers.length === 9 && data === 'selection-group') {
+        // Only process if we have 9 numbers selected
+        if (state.selectedNumbers.length === 9) {
             animateNumbersToBucket(state.selectedNumbers, bucketId);
         }
+    }
+    
+    function handleTouchMove(e, zone) {
+        // Simple touch move handler for bucket zones
+        const touch = e.touches[0];
+        if (!touch) return;
+        
+        const rect = zone.getBoundingClientRect();
+        if (
+            touch.clientX >= rect.left && 
+            touch.clientX <= rect.right && 
+            touch.clientY >= rect.top && 
+            touch.clientY <= rect.bottom
+        ) {
+            zone.classList.add('highlight');
+        } else {
+            zone.classList.remove('highlight');
+        }
+    }
+    
+    function handleDocumentTouchMove(e) {
+        // Prevent default to avoid scrolling issues
+        if (state.currentScreen === 'grid-screen') {
+            e.preventDefault();
+        }
+
+    }
+    
+    function handleDocumentTouchEnd(e) {
+        // Touch end handler
     }
     
     function animateNumbersToBucket(numbers, bucketId) {
@@ -649,13 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const bucketCenterX = bucketRect.left + bucketRect.width / 2;
         const bucketCenterY = bucketRect.top + bucketRect.height / 2;
         
-        // Hide the selection group during animation
-        const selectionGroup = document.getElementById('selection-group');
-        if (selectionGroup) {
-            selectionGroup.style.opacity = '0';
-        }
-        
-        // Animate each number to the bucket
+        // Animate each number to the bucket with a delay based on index
         numbersCopy.forEach((num, index) => {
             // Create an animated number element
             const animatedNumber = document.createElement('div');
@@ -715,8 +611,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update total progress
         state.totalProgress += Math.floor(progressIncrease / 5);
         
+        // Mark that we've shown the keyboard hint
+        state.hasShownKeyboardHint = true;
+        
         // Clear selected numbers
         state.selectedNumbers = [];
+        
+        // Reset drag state to prevent auto-dragging bug
+        state.isDragging = false;
+        state.mouseDown = false;
         
         // Update UI
         updateUI();
@@ -726,9 +629,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Flash the screen briefly
         flashScreen();
-        
-        // Update selection group
-        updateSelectionGroup();
         
         // Generate new numbers
         generateNumberGrid();
@@ -808,5 +708,77 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.removeChild(flash);
             }, 1000);
         }, 500);
+    }
+
+    // These functions are no longer needed as we're handling hover effects differently
+    function applySurroundingRippleEffect(cell) {
+        // No longer used
+    }
+    
+    function removeSurroundingRippleEffect(cell) {
+        // No longer used
+    }
+
+    // New function to handle keyboard events
+    function handleKeyDown(e) {
+        // Only process if we're on the grid screen and have 9 numbers selected
+        if (state.currentScreen !== 'grid-screen' || state.selectedNumbers.length !== 9) return;
+        
+        // Check if the key pressed is a number between 1 and 5
+        const key = e.key;
+        if (/^[1-5]$/.test(key)) {
+            const bucketId = key;
+            
+            // Highlight the bucket briefly to provide visual feedback
+            const bucketElement = document.getElementById(`bucket-${bucketId}`);
+            if (bucketElement) {
+                bucketElement.classList.add('highlight');
+                setTimeout(() => {
+                    bucketElement.classList.remove('highlight');
+                }, 300);
+            }
+            
+            // Animate numbers to the selected bucket
+            animateNumbersToBucket(state.selectedNumbers, bucketId);
+            
+            // Play selection sound
+            playSelectSound();
+        }
+    }
+
+    // New function to show keyboard shortcut hint
+    function showKeyboardShortcutHint() {
+        // Remove any existing hint
+        hideKeyboardShortcutHint();
+        
+        // Create hint element
+        const hint = document.createElement('div');
+        hint.id = 'keyboard-hint';
+        hint.className = 'keyboard-shortcut-hint';
+        hint.innerHTML = 'Press keys <span>1-5</span> to send to corresponding bucket';
+        
+        // Add to the grid screen
+        const gridScreen = document.getElementById('grid-screen');
+        if (gridScreen) {
+            gridScreen.appendChild(hint);
+            
+            // Animate in
+            setTimeout(() => {
+                hint.classList.add('visible');
+            }, 100);
+        }
+    }
+    
+    // New function to hide keyboard shortcut hint
+    function hideKeyboardShortcutHint() {
+        const existingHint = document.getElementById('keyboard-hint');
+        if (existingHint) {
+            existingHint.classList.remove('visible');
+            setTimeout(() => {
+                if (existingHint.parentNode) {
+                    existingHint.parentNode.removeChild(existingHint);
+                }
+            }, 300);
+        }
     }
 }); 

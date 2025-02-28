@@ -4,6 +4,11 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Courier New', monospace;
+    user-select: none; /* Prevent text selection */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE/Edge */
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M5,3 L5,18 L9,14 L12,19 L15,17 L12,12 L17,12 Z' fill='%2300c3ff' stroke='%2300c3ff' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E"), auto;
 }
 
 body {
@@ -75,6 +80,50 @@ body {
     }
 }
 
+/* Name Input Screen */
+.name-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.name-input {
+    background-color: transparent;
+    border: 2px solid #00c3ff;
+    color: #00c3ff;
+    padding: 15px;
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 195, 255, 0.3);
+}
+
+.name-input:focus {
+    outline: none;
+    box-shadow: 0 0 15px #00c3ff;
+}
+
+.submit-name-btn {
+    background-color: transparent;
+    color: #00c3ff;
+    border: 2px solid #00c3ff;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.8s ease;
+    text-shadow: 0 0 5px #00c3ff;
+    box-shadow: 0 0 10px rgba(0, 195, 255, 0.3);
+}
+
+.submit-name-btn:hover {
+    background-color: rgba(0, 195, 255, 0.2);
+    box-shadow: 0 0 15px #00c3ff;
+}
+
 /* Grid Container for Buttons */
 .grid-container {
     display: grid;
@@ -117,34 +166,47 @@ body {
     flex-wrap: wrap;
 }
 
+.user-name {
+    font-size: 1.2rem;
+    margin-right: auto;
+}
+
+.progress-info {
+    text-align: right;
+}
+
 .hex-codes {
     display: flex;
     gap: 10px;
+    margin-top: 5px;
+    font-size: 1rem;
 }
 
 .number-grid {
     display: grid;
     grid-template-columns: repeat(14, 1fr);
     grid-template-rows: repeat(10, 1fr);
-    gap: 5px;
-    margin: 20px 0;
-    height: 300px;
+    gap: 8px;
+    margin: 10px 0;
+    height: 350px;
     position: relative;
     touch-action: manipulation;
+    padding: 5px;
 }
 
 .number-cell {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: transform 0.8s ease, text-shadow 0.8s ease, color 0.8s ease;
+    font-size: 1rem;
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M5,3 L5,18 L9,14 L12,19 L15,17 L12,12 L17,12 Z' fill='%2300c3ff' stroke='%2300c3ff' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E"), auto;
+    transition: transform 0.2s ease-out, text-shadow 0.2s ease, color 0.2s ease;
     position: relative;
     -webkit-tap-highlight-color: rgba(0, 195, 255, 0.3);
     touch-action: manipulation;
     animation: wiggle var(--wiggle-duration, 5s) ease-in-out infinite alternate;
     animation-delay: var(--wiggle-delay, 0s);
+    will-change: transform;
 }
 
 @keyframes wiggle {
@@ -166,11 +228,25 @@ body {
 }
 
 .number-cell.hover-effect {
-    transform: scale(1.8);
-    text-shadow: 0 0 10px #00c3ff, 0 0 20px #00c3ff;
+    transform: scale(2.2);
     z-index: 10;
-    color: #fff;
     animation: none;
+    transition: transform 0.2s ease-out;
+}
+
+/* Ripple effect for surrounding cells - more gradual */
+.number-cell.ripple-effect-1 {
+    transform: scale(var(--dynamic-scale, 1.8));
+    z-index: 9;
+    animation: none;
+    transition: transform 0.2s ease-out;
+}
+
+.number-cell.ripple-effect-2 {
+    transform: scale(var(--dynamic-scale, 1.3));
+    z-index: 8;
+    animation: none;
+    transition: transform 0.2s ease-out;
 }
 
 .number-cell.selected {
@@ -179,6 +255,7 @@ body {
     text-shadow: 0 0 10px #fff, 0 0 20px #00c3ff, 0 0 30px #00c3ff;
     animation: selectedPulse 3s infinite alternate;
     z-index: 20;
+    pointer-events: auto;
 }
 
 @keyframes selectedPulse {
@@ -196,27 +273,9 @@ body {
     display: none; /* Hide the selected numbers container */
 }
 
-/* Selection Group */
+/* Selection Group - removing this as we're no longer using it */
 .selection-group {
-    position: absolute;
-    border: 2px dashed #00c3ff;
-    background-color: rgba(0, 195, 255, 0.1);
-    pointer-events: none;
-    z-index: 15;
-    opacity: 0;
-    transition: opacity 1s ease;
-    touch-action: none;
-}
-
-.selection-group.active {
-    opacity: 1;
-    pointer-events: all;
-    cursor: grab;
-}
-
-.selection-group.dragging {
-    opacity: 0.7;
-    cursor: grabbing;
+    display: none; /* Hide the selection group */
 }
 
 /* Buckets */
@@ -295,6 +354,15 @@ body {
     pointer-events: none;
 }
 
+/* Horizontal lines above and below grid */
+.grid-border-line {
+    height: 1px;
+    background-color: #00c3ff;
+    width: 100%;
+    box-shadow: 0 0 5px #00c3ff;
+    margin: 10px 0;
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
     .app-container {
@@ -327,8 +395,9 @@ body {
     }
     
     .number-grid {
-        height: 250px;
-        grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
+        height: 300px;
+        gap: 6px;
+        grid-template-columns: repeat(14, 1fr);
     }
     
     .number-cell {
@@ -355,7 +424,18 @@ body {
     }
     
     .number-cell.hover-effect {
-        transform: scale(1.5);
+        transform: scale(2.2);
+        transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .number-cell.ripple-effect-1 {
+        transform: scale(var(--dynamic-scale, 1.6));
+        transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+    
+    .number-cell.ripple-effect-2 {
+        transform: scale(var(--dynamic-scale, 1.3));
+        transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     
     .number-cell.selected {
@@ -370,4 +450,68 @@ body {
             transform: scale(1.7);
         }
     }
+}
+
+/* Shake animation for input validation */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Keyboard Shortcut Hint */
+.keyboard-shortcut-hint {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #00c3ff;
+    border: 2px solid #00c3ff;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 195, 255, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    pointer-events: none;
+}
+
+.keyboard-shortcut-hint span {
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 0 5px #00c3ff;
+}
+
+.keyboard-shortcut-hint.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    animation: hint-pulse 2s infinite alternate;
+}
+
+@keyframes hint-pulse {
+    0% {
+        box-shadow: 0 0 15px rgba(0, 195, 255, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 25px rgba(0, 195, 255, 0.8);
+    }
+}
+
+/* Highlight animation for buckets when keyboard shortcut is used */
+@keyframes bucket-highlight-pulse {
+    0% { box-shadow: 0 0 10px rgba(0, 195, 255, 0.5); }
+    50% { box-shadow: 0 0 25px rgba(0, 195, 255, 0.8); }
+    100% { box-shadow: 0 0 10px rgba(0, 195, 255, 0.5); }
+}
+
+.bucket-drop-zone.highlight {
+    animation: bucket-highlight-pulse 0.3s ease;
 } 
