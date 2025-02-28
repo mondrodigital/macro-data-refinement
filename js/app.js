@@ -618,8 +618,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressIncrease = Math.floor(Math.random() * 5) + 1;
         state.buckets[bucketId].progress += progressIncrease;
         
-        // Update total progress
-        state.totalProgress += Math.floor(progressIncrease / 5);
+        // Update total progress (ensure it's a more noticeable increase)
+        state.totalProgress += progressIncrease;
+        
+        // Ensure total progress doesn't exceed 100%
+        if (state.totalProgress > 100) {
+            state.totalProgress = 100;
+        }
         
         // Mark that we've shown the keyboard hint
         state.hasShownKeyboardHint = true;
