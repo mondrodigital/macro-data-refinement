@@ -624,6 +624,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Mark that we've shown the keyboard hint
         state.hasShownKeyboardHint = true;
         
+        // Hide the keyboard shortcut hint
+        hideKeyboardShortcutHint();
+        
         // Clear selected numbers
         state.selectedNumbers = [];
         
