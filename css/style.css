@@ -176,11 +176,41 @@ body {
 .progress-info {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 20px;
 }
 
+.progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.total-progress-bar {
+    width: 150px;
+    height: 8px;
+    background-color: rgba(0, 195, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0, 195, 255, 0.3);
+}
+
+.total-progress-fill {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background-color: #00c3ff;
+    box-shadow: 0 0 5px #00c3ff;
+    border-radius: 3px;
+    transition: width 0.8s ease-in-out;
+}
+
 .company-name {
-    font-size: 1.5rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
     font-weight: bold;
     letter-spacing: 2px;
     text-shadow: 0 0 10px #00c3ff;
@@ -319,39 +349,9 @@ body {
     text-shadow: 0 0 5px #00c3ff;
 }
 
-.bucket-progress-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 5px;
-    gap: 8px;
-}
-
 .bucket-progress {
     font-size: 0.9rem;
-    min-width: 30px;
-    text-align: right;
-}
-
-.bucket-progress-bar {
-    flex-grow: 1;
-    height: 6px;
-    background-color: rgba(0, 195, 255, 0.1);
-    border-radius: 3px;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid rgba(0, 195, 255, 0.3);
-}
-
-.bucket-progress-fill {
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: 100%;
-    background-color: #00c3ff;
-    box-shadow: 0 0 5px #00c3ff;
-    border-radius: 3px;
-    transition: width 0.8s ease-in-out;
+    margin-bottom: 5px;
 }
 
 .bucket-drop-zone {

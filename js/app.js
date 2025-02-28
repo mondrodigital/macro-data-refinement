@@ -654,17 +654,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (progressElement) {
                 progressElement.textContent = `${state.buckets[i].progress}%`;
             }
-            
-            // Update progress bar fill
-            const progressFill = document.getElementById(`bucket-${i}-progress-fill`);
-            if (progressFill) {
-                progressFill.style.width = `${state.buckets[i].progress}%`;
-            }
         }
 
         // Update total progress
         if (elements.totalProgress) {
             elements.totalProgress.textContent = `${state.totalProgress}% Complete`;
+        }
+        
+        // Update total progress bar fill
+        const totalProgressFill = document.getElementById('total-progress-fill');
+        if (totalProgressFill) {
+            totalProgressFill.style.width = `${state.totalProgress}%`;
         }
         
         // Update current file display
