@@ -809,302 +809,227 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Initialize the music player
-    function initMusicPlayer() {
-        // Set initial volume
-        elements.audioElement.volume = state.audioPlayer.volume;
-        elements.volumeSlider.value = state.audioPlayer.volume * 100;
-
-        // Handle audio error (file not found or cannot be played)
-        elements.audioElement.addEventListener('error', () => {
-            const audioStatus = document.querySelector('.audio-status');
-            if (audioStatus) {
-                audioStatus.textContent = 'Error loading audio file. See audio/README.md for instructions.';
-                audioStatus.style.color = 'rgba(255, 100, 100, 0.8)';
+    // Add this function to create a slide-out music player
+    function createSlideOutMusicPlayer() {
+        // First, hide the original music player if it exists
+        const originalPlayer = document.querySelector('.music-player');
+        if (originalPlayer) {
+            originalPlayer.style.display = 'none';
+        }
+        
+        // Create the slide-out player container
+        const slideOutPlayer = document.createElement('div');
+        slideOutPlayer.className = 'slide-out-player';
+        slideOutPlayer.innerHTML = `
+            <div class="player-content">
+                <h3>Music to Refine To</h3>
+                <div class="player-controls">
+                    <button class="play-pause-btn"><i class="fas fa-play"></i></button>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span class="current-time">0:00</span> / <span class="duration">0:00</span>
+                        </div>
+                    </div>
+                    <button class="mute-btn"><i class="fas fa-volume-up"></i></button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(slideOutPlayer);
+        
+        // Add styles for the slide-out player
+        const style = document.createElement('style');
+        style.textContent = `
+            .slide-out-player {
+                position: fixed;
+                right: 20px;
+                top: 100px;
+                width: 280px;
+                background-color: rgba(0, 24, 36, 0.3);
+                border: 2px solid #00c3ff;
+                border-radius: 10px;
+                box-shadow: 0 0 15px #00c3ff;
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                backdrop-filter: blur(5px);
+                animation: pulse 8s infinite alternate;
             }
             
-            // Disable play button
-            elements.playPauseBtn.disabled = true;
-            elements.playPauseBtn.style.opacity = '0.5';
-            elements.playPauseBtn.style.cursor = 'not-allowed';
-        });
-
-        // Update duration display when metadata is loaded
-        elements.audioElement.addEventListener('loadedmetadata', () => {
-            elements.durationDisplay.textContent = formatTime(elements.audioElement.duration);
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 15px #00c3ff;
+                }
+                100% {
+                    box-shadow: 0 0 25px #00c3ff;
+                }
+            }
             
-            // Hide the status message when audio is successfully loaded
-            const audioStatus = document.querySelector('.audio-status');
-            if (audioStatus) {
-                audioStatus.style.display = 'none';
+            /* Calculate position based on app container width */
+            @media (min-width: 1100px) {
+                .slide-out-player {
+                    right: calc(50% - 500px);
+                }
+            }
+            
+            .player-content {
+                padding: 15px;
+                width: 100%;
+            }
+            
+            .slide-out-player h3 {
+                color: #00c3ff;
+                text-shadow: 0 0 5px #00c3ff;
+                font-size: 18px;
+                margin: 0 0 15px 0;
+                text-align: center;
+                font-family: 'Courier New', monospace;
+            }
+            
+            .player-controls {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 5px;
+            }
+            
+            .player-controls button {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background-color: rgba(0, 195, 255, 0.1);
+                border: 1px solid #00c3ff;
+                color: #00c3ff;
+                font-size: 16px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+            }
+            
+            .player-controls button:hover {
+                background-color: rgba(0, 195, 255, 0.3);
+                box-shadow: 0 0 10px #00c3ff;
+            }
+            
+            .progress-container {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .progress-bar {
+                width: 100%;
+                height: 5px;
+                background: rgba(0, 195, 255, 0.2);
+                border-radius: 5px;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .progress-fill {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                background: #00c3ff;
+                width: 30%;
+                border-radius: 5px;
+                box-shadow: 0 0 5px #00c3ff;
+            }
+            
+            .time-display {
+                color: #00c3ff;
+                font-size: 12px;
+                text-align: center;
+                font-family: 'Courier New', monospace;
+            }
+            
+            /* Responsive adjustments */
+            @media (max-width: 1100px) {
+                .slide-out-player {
+                    right: 20px;
+                }
+            }
+            
+            @media (max-width: 900px) {
+                .slide-out-player {
+                    width: 240px;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .slide-out-player {
+                    bottom: 20px;
+                    top: auto;
+                    right: 20px;
+                    transform: none;
+                    width: 220px;
+                }
+            }
+        `;
+        
+        document.head.appendChild(style);
+        
+        // Set up audio functionality
+        let audio = document.querySelector('audio');
+        if (!audio) {
+            audio = new Audio('audio/music.mp3');
+            audio.loop = true;
+        }
+        
+        // Add event listeners for the player controls
+        const playPauseBtn = slideOutPlayer.querySelector('.play-pause-btn');
+        playPauseBtn.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play();
+                this.innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                audio.pause();
+                this.innerHTML = '<i class="fas fa-play"></i>';
             }
         });
-
-        // Update current time display and progress bar during playback
-        elements.audioElement.addEventListener('timeupdate', () => {
-            const currentTime = elements.audioElement.currentTime;
-            const duration = elements.audioElement.duration || 0;
-            const progressPercent = (currentTime / duration) * 100;
-            
-            elements.progressFill.style.width = `${progressPercent}%`;
-            elements.currentTimeDisplay.textContent = formatTime(currentTime);
+        
+        const muteBtn = slideOutPlayer.querySelector('.mute-btn');
+        muteBtn.addEventListener('click', function() {
+            audio.muted = !audio.muted;
+            this.innerHTML = audio.muted ? 
+                '<i class="fas fa-volume-mute"></i>' : 
+                '<i class="fas fa-volume-up"></i>';
         });
-
-        // Handle play/pause button click
-        elements.playPauseBtn.addEventListener('click', togglePlayPause);
-
-        // Handle progress bar click to seek
-        elements.progressBar.addEventListener('click', (e) => {
-            const progressBar = elements.progressBar;
-            const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
-            const progressBarWidth = progressBar.offsetWidth;
-            const seekTime = (clickPosition / progressBarWidth) * elements.audioElement.duration;
-            
-            elements.audioElement.currentTime = seekTime;
-        });
-
-        // Handle mute button click
-        elements.muteBtn.addEventListener('click', toggleMute);
-
-        // Handle volume slider change
-        elements.volumeSlider.addEventListener('input', (e) => {
-            const volume = e.target.value / 100;
-            elements.audioElement.volume = volume;
-            state.audioPlayer.volume = volume;
-            
-            // Update mute button icon based on volume
-            updateMuteButtonIcon(volume);
-        });
-
-        // Handle audio ended event
-        elements.audioElement.addEventListener('ended', () => {
-            // Reset play/pause button to play state
-            elements.playIcon.style.display = 'block';
-            elements.pauseIcon.style.display = 'none';
-            state.audioPlayer.isPlaying = false;
-            
-            // Restart the audio
-            elements.audioElement.currentTime = 0;
-        });
-    }
-
-    // Toggle play/pause
-    function togglePlayPause() {
-        if (state.audioPlayer.isPlaying) {
-            elements.audioElement.pause();
-            elements.playIcon.style.display = 'block';
-            elements.pauseIcon.style.display = 'none';
-        } else {
-            elements.audioElement.play();
-            elements.playIcon.style.display = 'none';
-            elements.pauseIcon.style.display = 'block';
+        
+        // Add Font Awesome if it's not already included
+        if (!document.querySelector('link[href*="font-awesome"]')) {
+            const fontAwesome = document.createElement('link');
+            fontAwesome.rel = 'stylesheet';
+            fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+            document.head.appendChild(fontAwesome);
         }
         
-        state.audioPlayer.isPlaying = !state.audioPlayer.isPlaying;
+        return slideOutPlayer;
     }
 
-    // Toggle mute
-    function toggleMute() {
-        state.audioPlayer.isMuted = !state.audioPlayer.isMuted;
-        elements.audioElement.muted = state.audioPlayer.isMuted;
-        
-        updateMuteButtonIcon(state.audioPlayer.isMuted ? 0 : state.audioPlayer.volume);
-    }
+    // Add this to the existing document ready function or create a new one
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, adding slide-out player');
+        setTimeout(createSlideOutMusicPlayer, 1000);
+    });
 
-    // Update mute button icon based on volume
-    function updateMuteButtonIcon(volume) {
-        if (volume === 0 || state.audioPlayer.isMuted) {
-            elements.muteBtn.textContent = '🔇';
-        } else if (volume < 50) {
-            elements.muteBtn.textContent = '🔉';
-        } else {
-            elements.muteBtn.textContent = '🔊';
-        }
-    }
-
-    // Format time in seconds to MM:SS format
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = Math.floor(seconds % 60);
-        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-    }
-
-    // YouTube API callback when API is ready
-    window.onYouTubeIframeAPIReady = function() {
-        state.audioPlayer.youtubeReady = true;
-        initYouTubePlayer();
-    };
-
-    // Initialize YouTube player
-    function initYouTubePlayer() {
-        if (!state.audioPlayer.youtubeReady) return;
-        
-        state.audioPlayer.youtubePlayer = new YT.Player('youtube-player-container', {
-            videoId: state.audioPlayer.youtubeVideoId,
-            playerVars: {
-                'autoplay': 0,
-                'controls': 0,
-                'showinfo': 0,
-                'rel': 0,
-                'iv_load_policy': 3,
-                'fs': 0,
-                'modestbranding': 1,
-                'start': 90 // Start at 1:30 to skip intro
-            },
-            events: {
-                'onReady': onPlayerReady,
-                'onStateChange': onPlayerStateChange
-            }
-        });
-    }
-
-    // YouTube player ready event
-    function onPlayerReady(event) {
-        // Set initial volume
-        state.audioPlayer.youtubePlayer.setVolume(state.audioPlayer.volume);
-        elements.volumeSlider.value = state.audioPlayer.volume;
-        
-        // Set up music player controls
-        initMusicPlayerControls();
-        
-        // Update duration display
-        const duration = state.audioPlayer.youtubePlayer.getDuration();
-        elements.durationDisplay.textContent = formatTime(duration);
-    }
-
-    // YouTube player state change event
-    function onPlayerStateChange(event) {
-        // YT.PlayerState.ENDED = 0
-        // YT.PlayerState.PLAYING = 1
-        // YT.PlayerState.PAUSED = 2
-        if (event.data === YT.PlayerState.PLAYING) {
-            state.audioPlayer.isPlaying = true;
-            elements.playIcon.style.display = 'none';
-            elements.pauseIcon.style.display = 'block';
-            
-            // Start progress update interval
-            startProgressUpdate();
-        } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
-            state.audioPlayer.isPlaying = false;
-            elements.playIcon.style.display = 'block';
-            elements.pauseIcon.style.display = 'none';
-            
-            // Stop progress update interval
-            stopProgressUpdate();
-            
-            // If ended, restart from beginning
-            if (event.data === YT.PlayerState.ENDED) {
-                state.audioPlayer.youtubePlayer.seekTo(90, true); // Restart at 1:30
-            }
-        }
-    }
-
-    // Initialize music player controls
-    function initMusicPlayerControls() {
-        // Handle play/pause button click
-        elements.playPauseBtn.addEventListener('click', togglePlayPause);
-
-        // Handle progress bar click to seek
-        elements.progressBar.addEventListener('click', (e) => {
-            if (!state.audioPlayer.youtubePlayer) return;
-            
-            const progressBar = elements.progressBar;
-            const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
-            const progressBarWidth = progressBar.offsetWidth;
-            const seekTime = (clickPosition / progressBarWidth) * 
-                (state.audioPlayer.youtubePlayer.getDuration() - 90) + 90; // Adjust for start time
-            
-            state.audioPlayer.youtubePlayer.seekTo(seekTime, true);
-        });
-
-        // Handle mute button click
-        elements.muteBtn.addEventListener('click', toggleMute);
-
-        // Handle volume slider change
-        elements.volumeSlider.addEventListener('input', (e) => {
-            if (!state.audioPlayer.youtubePlayer) return;
-            
-            const volume = parseInt(e.target.value);
-            state.audioPlayer.volume = volume;
-            state.audioPlayer.youtubePlayer.setVolume(volume);
-            
-            // Update mute button icon based on volume
-            updateMuteButtonIcon(volume);
-        });
-    }
-
-    // Start progress update interval
-    function startProgressUpdate() {
-        // Clear any existing interval
-        stopProgressUpdate();
-        
-        // Update progress every 500ms
-        state.audioPlayer.updateInterval = setInterval(() => {
-            if (!state.audioPlayer.youtubePlayer) return;
-            
-            const currentTime = state.audioPlayer.youtubePlayer.getCurrentTime();
-            const duration = state.audioPlayer.youtubePlayer.getDuration();
-            
-            // Calculate progress percentage (accounting for start time)
-            const adjustedCurrentTime = currentTime - 90;
-            const adjustedDuration = duration - 90;
-            const progressPercent = (adjustedCurrentTime / adjustedDuration) * 100;
-            
-            // Update progress bar and time display
-            elements.progressFill.style.width = `${progressPercent}%`;
-            elements.currentTimeDisplay.textContent = formatTime(currentTime);
-        }, 500);
-    }
-
-    // Stop progress update interval
-    function stopProgressUpdate() {
-        if (state.audioPlayer.updateInterval) {
-            clearInterval(state.audioPlayer.updateInterval);
-            state.audioPlayer.updateInterval = null;
-        }
-    }
-
-    // Toggle play/pause
-    function togglePlayPause() {
-        if (!state.audioPlayer.youtubePlayer) return;
-        
-        if (state.audioPlayer.isPlaying) {
-            state.audioPlayer.youtubePlayer.pauseVideo();
-        } else {
-            state.audioPlayer.youtubePlayer.playVideo();
-        }
-    }
-
-    // Toggle mute
-    function toggleMute() {
-        if (!state.audioPlayer.youtubePlayer) return;
-        
-        if (state.audioPlayer.isMuted) {
-            state.audioPlayer.youtubePlayer.unMute();
-            state.audioPlayer.youtubePlayer.setVolume(state.audioPlayer.volume);
-        } else {
-            state.audioPlayer.youtubePlayer.mute();
-        }
-        
-        state.audioPlayer.isMuted = !state.audioPlayer.isMuted;
-        updateMuteButtonIcon(state.audioPlayer.isMuted ? 0 : state.audioPlayer.volume);
-    }
-
-    // Update mute button icon based on volume
-    function updateMuteButtonIcon(volume) {
-        if (volume === 0 || state.audioPlayer.isMuted) {
-            elements.muteBtn.textContent = '🔇';
-        } else if (volume < 50) {
-            elements.muteBtn.textContent = '🔉';
-        } else {
-            elements.muteBtn.textContent = '🔊';
-        }
-    }
-
-    // Format time in seconds to MM:SS format
-    function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = Math.floor(seconds % 60);
-        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    // Also add it to the showGridScreen function if it exists
+    if (typeof window.showGridScreen === 'function') {
+        const originalShowGridScreen = window.showGridScreen;
+        window.showGridScreen = function() {
+            originalShowGridScreen.apply(this, arguments);
+            setTimeout(function() {
+                if (!document.querySelector('.slide-out-player')) {
+                    createSlideOutMusicPlayer();
+                }
+            }, 1000);
+        };
     }
 }); 
