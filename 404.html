@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00c3ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            border: 2px solid #00c3ff;
+            padding: 40px;
+            box-shadow: 0 0 20px #00c3ff, inset 0 0 10px #00c3ff;
+            animation: pulse 4s infinite alternate;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00c3ff;
+        }
+        
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            text-shadow: 0 0 5px #00c3ff;
+        }
+        
+        a {
+            color: #00c3ff;
+            text-decoration: none;
+            border: 1px solid #00c3ff;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px #00c3ff;
+            box-shadow: 0 0 10px rgba(0, 195, 255, 0.3);
+        }
+        
+        a:hover {
+            background-color: rgba(0, 195, 255, 0.2);
+            box-shadow: 0 0 15px #00c3ff;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 20px #00c3ff, inset 0 0 10px #00c3ff;
+            }
+            100% {
+                box-shadow: 0 0 30px #00c3ff, inset 0 0 15px #00c3ff;
+            }
+        }
+        
+        .error-code {
+            font-size: 8rem;
+            margin: 0;
+            text-shadow: 0 0 20px #00c3ff;
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #00c3ff, 0 0 20px #00c3ff;
+            }
+            to {
+                text-shadow: 0 0 20px #00c3ff, 0 0 40px #00c3ff, 0 0 60px #00c3ff;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-code">404</div>
+        <h1>File Not Found</h1>
+        <p>The requested file has been severed from this server.</p>
+        <a href="/">Return to Refinement</a>
+    </div>
+</body>
+</html> 

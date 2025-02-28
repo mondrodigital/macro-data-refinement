@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macro Data Refinement</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Screen 1: Branch Selection -->
+        <div id="branch-screen" class="screen active">
+            <div class="header-text">Select your branch country</div>
+            <div class="grid-container">
+                <button class="grid-button" data-country="USA">USA</button>
+                <button class="grid-button" data-country="France">France</button>
+                <button class="grid-button" data-country="Italy">Italy</button>
+                <button class="grid-button" data-country="Germany">Germany</button>
+                <button class="grid-button" data-country="Spain">Spain</button>
+                <button class="grid-button" data-country="China">China</button>
+                <button class="grid-button" data-country="Japan">Japan</button>
+                <button class="grid-button" data-country="Portugal">Portugal</button>
+                <button class="grid-button" data-country="Russia">Russia</button>
+                <button class="grid-button" data-country="Brazil">Brazil</button>
+                <button class="grid-button" data-country="Turkey">Turkey</button>
+                <button class="grid-button" data-country="Korea">Korea</button>
+            </div>
+        </div>
+
+        <!-- Screen 2: File Selection -->
+        <div id="file-screen" class="screen">
+            <div class="header-text">Choose a file to refine</div>
+            <div class="grid-container">
+                <button class="grid-button" data-file="PiGmy">PiGmy</button>
+                <button class="grid-button" data-file="Quirk">Quirk</button>
+                <button class="grid-button" data-file="Enola">Enola</button>
+                <button class="grid-button" data-file="Tesseract">Tesseract</button>
+                <button class="grid-button" data-file="Tachyon">Tachyon</button>
+                <button class="grid-button" data-file="Euler">Euler</button>
+                <button class="grid-button" data-file="Genesis">Genesis</button>
+                <button class="grid-button" data-file="Tartar">Tartar</button>
+                <button class="grid-button" data-file="LaVey">LaVey</button>
+            </div>
+        </div>
+
+        <!-- Screen 3: Number Grid -->
+        <div id="grid-screen" class="screen">
+            <div class="status-bar">
+                <div id="current-file">PiGmy</div>
+                <div class="hex-codes">
+                    <span id="hex-code-1">x00000</span>
+                    <span id="hex-code-2">x00006</span>
+                </div>
+                <div id="total-progress">3% Complete</div>
+            </div>
+
+            <div id="number-grid" class="number-grid"></div>
+
+            <div class="buckets">
+                <div class="bucket" data-bucket="1">
+                    <div class="bucket-label">01</div>
+                    <div class="bucket-progress" id="bucket-1-progress">1%</div>
+                    <div class="bucket-drop-zone" id="bucket-1"></div>
+                </div>
+                <div class="bucket" data-bucket="2">
+                    <div class="bucket-label">02</div>
+                    <div class="bucket-progress" id="bucket-2-progress">5%</div>
+                    <div class="bucket-drop-zone" id="bucket-2"></div>
+                </div>
+                <div class="bucket" data-bucket="3">
+                    <div class="bucket-label">03</div>
+                    <div class="bucket-progress" id="bucket-3-progress">0%</div>
+                    <div class="bucket-drop-zone" id="bucket-3"></div>
+                </div>
+                <div class="bucket" data-bucket="4">
+                    <div class="bucket-label">04</div>
+                    <div class="bucket-progress" id="bucket-4-progress">0%</div>
+                    <div class="bucket-drop-zone" id="bucket-4"></div>
+                </div>
+                <div class="bucket" data-bucket="5">
+                    <div class="bucket-label">05</div>
+                    <div class="bucket-progress" id="bucket-5-progress">3%</div>
+                    <div class="bucket-drop-zone" id="bucket-5"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html> 
