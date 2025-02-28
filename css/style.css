@@ -498,7 +498,7 @@ body {
 /* Keyboard Shortcut Hint */
 .keyboard-shortcut-hint {
     position: absolute;
-    top: 420px;
+    bottom: 120px;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
     background-color: rgba(0, 0, 0, 0.8);
@@ -697,7 +697,7 @@ body {
 /* Mobile adjustments for keyboard hint */
 @media (max-width: 768px) {
     .keyboard-shortcut-hint {
-        top: 380px;
+        bottom: 140px;
         font-size: 14px;
         padding: 10px 15px;
     }
@@ -705,7 +705,7 @@ body {
 
 @media (max-width: 480px) {
     .keyboard-shortcut-hint {
-        top: 350px;
+        bottom: 160px;
         font-size: 12px;
         padding: 8px 12px;
     }
