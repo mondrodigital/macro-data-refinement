@@ -2,6 +2,12 @@
 
 A web application that simulates the macro data refinement work from the TV show "Severance". This application recreates the futuristic, neon blue interface seen in the show with slow, deliberate animations that mimic the show's aesthetic.
 
+![Severance Macro Data Refinement](https://github.com/username/macrorefinement/raw/main/screenshots/preview.png)
+
+## Demo
+
+You can try the live demo here: [Macro Data Refinement Simulator](https://username.github.io/macrorefinement)
+
 ## Features
 
 - **Branch Country Selection**: Choose your branch country from a grid of options
@@ -22,7 +28,7 @@ A web application that simulates the macro data refinement work from the TV show
    - Drag the entire selection to one of the buckets at the bottom
    - Watch as the bucket's percentage increases and contributes to the overall completion
 
-## Running the Application
+## Running Locally
 
 ### Option 1: Open Directly in Browser
 Simply open the `index.html` file in a modern web browser. No server or build process is required.
@@ -31,9 +37,21 @@ Simply open the `index.html` file in a modern web browser. No server or build pr
 For a more authentic experience, you can use the included Node.js server:
 
 1. Make sure you have Node.js installed on your system
-2. Open a terminal in the project directory
-3. Run the command: `node server.js`
-4. Open your browser and navigate to `http://localhost:3000`
+2. Clone this repository: `git clone https://github.com/username/macrorefinement.git`
+3. Navigate to the project directory: `cd macrorefinement`
+4. Run the command: `node server.js`
+5. Open your browser and navigate to `http://localhost:3000`
+
+## Deployment
+
+To deploy this project to GitHub Pages:
+
+1. Fork this repository
+2. Go to the repository settings
+3. Navigate to the "Pages" section
+4. Select the main branch as the source
+5. Click "Save"
+6. Your site will be published at `https://yourusername.github.io/macrorefinement`
 
 ## Technical Details
 
@@ -46,4 +64,12 @@ This application is built using:
 
 ## Inspiration
 
-This project is inspired by the macro data refinement scenes from the Apple TV+ show "Severance", where employees perform mysterious data refinement tasks on retro-futuristic computer interfaces with slow, deliberate interactions. 
+This project is inspired by the macro data refinement scenes from the Apple TV+ show "Severance", where employees perform mysterious data refinement tasks on retro-futuristic computer interfaces with slow, deliberate interactions.
+
+## License
+
+MIT License - feel free to use and modify for your own projects.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. 
