@@ -166,20 +166,38 @@ body {
     flex-wrap: wrap;
 }
 
-.user-name {
-    font-size: 1.2rem;
+.project-name {
+    font-size: 1.5rem;
     margin-right: auto;
+    text-shadow: 0 0 8px #00c3ff;
+    letter-spacing: 1px;
 }
 
 .progress-info {
-    text-align: right;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.company-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px #00c3ff;
+}
+
+.hex-codes-container {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
 }
 
 .hex-codes {
     display: flex;
     gap: 10px;
-    margin-top: 5px;
     font-size: 1rem;
+    text-shadow: 0 0 5px #00c3ff;
+    opacity: 0.8;
 }
 
 .number-grid {
@@ -392,6 +410,20 @@ body {
         flex-direction: column;
         align-items: flex-start;
         gap: 5px;
+    }
+    
+    .progress-info {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 5px;
+    }
+    
+    .project-name {
+        font-size: 1.2rem;
+    }
+    
+    .company-name {
+        font-size: 1.2rem;
     }
     
     .number-grid {
@@ -647,34 +679,6 @@ body {
     flex-direction: row;
     align-items: center;
     gap: 12px;
-}
-
-/* Company name in status bar */
-.company-name {
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-shadow: 0 0 10px #00c3ff;
-    letter-spacing: 2px;
-}
-
-/* Make the music player responsive */
-@media (max-width: 768px) {
-    .music-player {
-        position: fixed;
-        top: auto;
-        bottom: 20px;
-        right: 20px;
-        width: 220px;
-    }
-    
-    .music-player-title {
-        font-size: 1rem;
-    }
-    
-    .player-btn {
-        width: 30px;
-        height: 30px;
-    }
 }
 
 /* Hide music player on non-grid screens */

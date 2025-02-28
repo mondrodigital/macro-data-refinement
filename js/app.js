@@ -167,37 +167,13 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log(`Setting up listener for file button ${index}:`, button.dataset.file);
             
             button.addEventListener('click', () => {
-                console.log('File button clicked:', button.dataset.file);
-                state.selectedFile = button.dataset.file;
-                
-                // Check if currentFile element exists
-                if (elements.currentFile) {
-                    elements.currentFile.textContent = state.selectedFile;
-                } else {
-                    console.error('Current file element not found');
-                }
-                
-                navigateToScreen('grid-screen');
-                generateNumberGrid();
-                playSelectSound();
+                handleFileSelection(button);
             });
             
             // Add touch event for mobile
             button.addEventListener('touchstart', (e) => {
                 e.preventDefault(); // Prevent double-firing with click
-                console.log('File button touched:', button.dataset.file);
-                state.selectedFile = button.dataset.file;
-                
-                // Check if currentFile element exists
-                if (elements.currentFile) {
-                    elements.currentFile.textContent = state.selectedFile;
-                } else {
-                    console.error('Current file element not found');
-                }
-                
-                navigateToScreen('grid-screen');
-                generateNumberGrid();
-                playSelectSound();
+                handleFileSelection(button);
             }, { passive: false });
         });
 
@@ -678,7 +654,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Update total progress
-        elements.totalProgress.textContent = `${state.totalProgress}% Complete`;
+        if (elements.totalProgress) {
+            elements.totalProgress.textContent = `${state.totalProgress}% Complete`;
+        }
+        
+        // Update current file display
+        if (elements.currentFile && state.selectedFile) {
+            elements.currentFile.textContent = state.selectedFile;
+        }
     }
 
     // Hex code animation
@@ -1038,5 +1021,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 1000);
         };
+    }
+
+    function handleFileSelection(button) {
+        console.log('File button clicked:', button.dataset.file);
+        state.selectedFile = button.dataset.file;
+        
+        // Update the project name display
+        if (elements.currentFile) {
+            elements.currentFile.textContent = state.selectedFile;
+        } else {
+            console.error('Current file element not found');
+        }
+        
+        navigateToScreen('grid-screen');
+        generateNumberGrid();
+        playSelectSound();
     }
 }); 
