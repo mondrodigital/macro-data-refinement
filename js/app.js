@@ -654,6 +654,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (progressElement) {
                 progressElement.textContent = `${state.buckets[i].progress}%`;
             }
+            
+            // Update progress bar fill
+            const progressFill = document.getElementById(`bucket-${i}-progress-fill`);
+            if (progressFill) {
+                progressFill.style.width = `${state.buckets[i].progress}%`;
+            }
         }
 
         // Update total progress
