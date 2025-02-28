@@ -28,6 +28,7 @@ body {
     padding: 20px;
     animation: pulse 8s infinite alternate;
     overflow: auto;
+    background-color: #001824;
 }
 
 @keyframes pulse {
@@ -123,7 +124,7 @@ body {
 
 .number-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
+    grid-template-columns: repeat(14, 1fr);
     grid-template-rows: repeat(10, 1fr);
     gap: 5px;
     margin: 20px 0;
@@ -138,18 +139,38 @@ body {
     align-items: center;
     font-size: 1.2rem;
     cursor: pointer;
-    transition: all 1.2s ease;
+    transition: transform 0.8s ease, text-shadow 0.8s ease, color 0.8s ease;
     position: relative;
     -webkit-tap-highlight-color: rgba(0, 195, 255, 0.3);
     touch-action: manipulation;
+    animation: wiggle var(--wiggle-duration, 5s) ease-in-out infinite alternate;
+    animation-delay: var(--wiggle-delay, 0s);
 }
 
-.number-cell:hover, .number-cell:active {
+@keyframes wiggle {
+    0% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(var(--wiggle-x, 2px), var(--wiggle-y, -2px));
+    }
+    50% {
+        transform: translate(var(--wiggle-x2, -2px), var(--wiggle-y2, 2px));
+    }
+    75% {
+        transform: translate(var(--wiggle-x3, 1px), var(--wiggle-y3, -1px));
+    }
+    100% {
+        transform: translate(var(--wiggle-x4, -1px), var(--wiggle-y4, 1px));
+    }
+}
+
+.number-cell.hover-effect {
     transform: scale(1.8);
     text-shadow: 0 0 10px #00c3ff, 0 0 20px #00c3ff;
     z-index: 10;
     color: #fff;
-    transition-duration: 1.5s;
+    animation: none;
 }
 
 .number-cell.selected {
@@ -236,6 +257,8 @@ body {
     align-items: center;
     transition: all 1.5s ease;
     touch-action: none;
+    position: relative;
+    overflow: hidden;
 }
 
 .bucket-drop-zone.highlight {
@@ -245,11 +268,31 @@ body {
     transition-duration: 0.8s;
 }
 
+.bucket-drop-zone.opening {
+    height: 80px;
+    transition: height 0.8s ease-out;
+}
+
+.bucket-drop-zone.closing {
+    height: 40px;
+    transition: height 0.8s ease-in;
+}
+
 /* Dragging */
 .dragging {
     opacity: 0.7;
     transform: scale(1.1);
     box-shadow: 0 0 15px #00c3ff;
+}
+
+/* Number Animation */
+.number-animation {
+    position: absolute;
+    color: #fff;
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px #fff, 0 0 20px #00c3ff;
+    z-index: 30;
+    pointer-events: none;
 }
 
 /* Mobile Responsive Styles */
@@ -285,6 +328,7 @@ body {
     
     .number-grid {
         height: 250px;
+        grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
     }
     
     .number-cell {
@@ -310,7 +354,7 @@ body {
         width: 45%;
     }
     
-    .number-cell:hover, .number-cell:active {
+    .number-cell.hover-effect {
         transform: scale(1.5);
     }
     

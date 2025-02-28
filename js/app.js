@@ -21,7 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
         isDragging: false,
         touchIdentifier: null,
         dragOffsetX: 0,
-        dragOffsetY: 0
+        dragOffsetY: 0,
+        isMobile: false,
+        mouseDown: false,
+        hoverCells: []
     };
 
     // DOM Elements
@@ -48,6 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initApp();
 
     function initApp() {
+        // Detect if mobile
+        detectMobile();
+        
         // Add event listeners
         addEventListeners();
         
@@ -59,6 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Ensure viewport meta tag is set for mobile
         ensureViewportMeta();
+    }
+    
+    function detectMobile() {
+        state.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        document.body.classList.toggle('mobile-device', state.isMobile);
     }
     
     function ensureViewportMeta() {
@@ -127,6 +138,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('touchmove', handleDocumentTouchMove, { passive: false });
         document.addEventListener('touchend', handleDocumentTouchEnd);
         document.addEventListener('touchcancel', handleDocumentTouchEnd);
+        
+        // Add mouse events for desktop
+        if (!state.isMobile) {
+            document.addEventListener('mousedown', handleDocumentMouseDown);
+            document.addEventListener('mouseup', handleDocumentMouseUp);
+            document.addEventListener('mousemove', handleDocumentMouseMove);
+        }
     }
 
     function navigateToScreen(screenId) {
@@ -146,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Generate random numbers for the grid
         const rows = 10;
-        const cols = 18;
+        const cols = 14;
 
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
@@ -157,25 +175,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 cell.dataset.row = i;
                 cell.dataset.col = j;
                 cell.dataset.value = number;
-
-                // Add click event to select numbers
-                cell.addEventListener('click', () => {
-                    handleNumberSelection(cell);
-                });
                 
-                // Add touch event for mobile
-                cell.addEventListener('touchstart', (e) => {
-                    // Only prevent default if we're not scrolling
-                    if (state.currentScreen === 'grid-screen') {
-                        e.preventDefault();
-                    }
-                    handleNumberSelection(cell);
-                }, { passive: false });
+                // Add random wiggle animation properties
+                setWiggleProperties(cell);
 
-                // Add hover sound effect
-                cell.addEventListener('mouseenter', () => {
-                    playHoverSound();
-                });
+                if (state.isMobile) {
+                    // Mobile: Use click/touch to select
+                    cell.addEventListener('click', () => {
+                        handleNumberSelection(cell);
+                    });
+                    
+                    cell.addEventListener('touchstart', (e) => {
+                        if (state.currentScreen === 'grid-screen') {
+                            e.preventDefault();
+                        }
+                        handleNumberSelection(cell);
+                    }, { passive: false });
+                } else {
+                    // Desktop: Use hover and drag to select
+                    cell.addEventListener('mouseenter', () => {
+                        handleNumberHover(cell);
+                        playHoverSound();
+                    });
+                    
+                    cell.addEventListener('mouseleave', () => {
+                        if (!state.mouseDown) {
+                            handleNumberUnhover(cell);
+                        }
+                    });
+                }
 
                 elements.numberGrid.appendChild(cell);
             }
@@ -183,6 +211,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Create selection group element
         createSelectionGroup();
+    }
+    
+    function setWiggleProperties(cell) {
+        // Randomly decide if this cell should wiggle (70% chance)
+        if (Math.random() < 0.7) {
+            // Set random wiggle properties
+            const wiggleAmount = Math.random() * 3 + 1; // 1-4px
+            const wiggleSpeed = Math.random() * 6 + 4; // 4-10s
+            const wiggleDelay = Math.random() * 2; // 0-2s
+            
+            cell.style.setProperty('--wiggle-duration', `${wiggleSpeed}s`);
+            cell.style.setProperty('--wiggle-delay', `${wiggleDelay}s`);
+            cell.style.setProperty('--wiggle-x', `${wiggleAmount}px`);
+            cell.style.setProperty('--wiggle-y', `${-wiggleAmount}px`);
+            cell.style.setProperty('--wiggle-x2', `${-wiggleAmount}px`);
+            cell.style.setProperty('--wiggle-y2', `${wiggleAmount}px`);
+            cell.style.setProperty('--wiggle-x3', `${wiggleAmount/2}px`);
+            cell.style.setProperty('--wiggle-y3', `${-wiggleAmount/2}px`);
+            cell.style.setProperty('--wiggle-x4', `${-wiggleAmount/2}px`);
+            cell.style.setProperty('--wiggle-y4', `${wiggleAmount/2}px`);
+        }
     }
 
     function createSelectionGroup() {
@@ -207,6 +256,119 @@ document.addEventListener('DOMContentLoaded', () => {
 
         elements.numberGrid.appendChild(selectionGroup);
     }
+    
+    // Desktop mouse event handlers
+    function handleDocumentMouseDown(e) {
+        if (state.currentScreen !== 'grid-screen') return;
+        
+        state.mouseDown = true;
+        
+        // If we have hovered cells, select them
+        state.hoverCells.forEach(cell => {
+            if (!cell.classList.contains('selected')) {
+                handleNumberSelection(cell);
+            }
+        });
+    }
+    
+    function handleDocumentMouseUp(e) {
+        if (state.currentScreen !== 'grid-screen') return;
+        
+        state.mouseDown = false;
+        
+        // Clear hover cells that aren't selected
+        state.hoverCells.forEach(cell => {
+            if (!cell.classList.contains('selected')) {
+                handleNumberUnhover(cell);
+            }
+        });
+        
+        state.hoverCells = [];
+        
+        // If we have 9 selected and we're dragging, check if we're over a bucket
+        if (state.selectedNumbers.length === 9 && state.isDragging) {
+            const dropZone = checkDropZones(e.clientX, e.clientY);
+            if (dropZone) {
+                const bucketId = dropZone.id.split('-')[1];
+                animateNumbersToBucket(state.selectedNumbers, bucketId);
+            } else {
+                // Reset position if not dropped on a valid zone
+                const selectionGroup = document.getElementById('selection-group');
+                if (selectionGroup) {
+                    resetSelectionGroupPosition(selectionGroup);
+                }
+            }
+            
+            state.isDragging = false;
+        }
+    }
+    
+    function handleDocumentMouseMove(e) {
+        if (state.currentScreen !== 'grid-screen' || !state.mouseDown) return;
+        
+        // If we have 9 selected, start dragging
+        if (state.selectedNumbers.length === 9) {
+            if (!state.isDragging) {
+                state.isDragging = true;
+                const selectionGroup = document.getElementById('selection-group');
+                if (selectionGroup) {
+                    selectionGroup.classList.add('dragging');
+                    
+                    // Calculate drag offset
+                    const rect = selectionGroup.getBoundingClientRect();
+                    state.dragOffsetX = e.clientX - rect.left;
+                    state.dragOffsetY = e.clientY - rect.top;
+                    
+                    playDragSound();
+                }
+            }
+            
+            // Move the selection group
+            const selectionGroup = document.getElementById('selection-group');
+            if (selectionGroup && selectionGroup.classList.contains('dragging')) {
+                const gridRect = elements.numberGrid.getBoundingClientRect();
+                
+                selectionGroup.style.left = `${e.clientX - gridRect.left - state.dragOffsetX}px`;
+                selectionGroup.style.top = `${e.clientY - gridRect.top - state.dragOffsetY}px`;
+                
+                // Check if over a drop zone
+                checkDropZones(e.clientX, e.clientY);
+            }
+        }
+    }
+    
+    function handleNumberHover(cell) {
+        // If already have 9 selections and this one isn't selected, don't allow more
+        if (state.selectedNumbers.length >= 9 && !cell.classList.contains('selected')) {
+            return;
+        }
+        
+        // Add hover effect
+        cell.classList.add('hover-effect');
+        
+        // Add to hover cells array if not already there
+        if (!state.hoverCells.includes(cell)) {
+            state.hoverCells.push(cell);
+        }
+        
+        // If mouse is down, select the cell
+        if (state.mouseDown && !cell.classList.contains('selected')) {
+            handleNumberSelection(cell);
+        }
+    }
+    
+    function handleNumberUnhover(cell) {
+        // Remove hover effect if not selected
+        if (!cell.classList.contains('selected')) {
+            cell.classList.remove('hover-effect');
+            
+            // Remove from hover cells array
+            const index = state.hoverCells.indexOf(cell);
+            if (index !== -1) {
+                state.hoverCells.splice(index, 1);
+            }
+        }
+    }
 
     function handleNumberSelection(cell) {
         // If already have 9 selections and this one isn't selected, don't allow more
@@ -215,21 +377,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Toggle selection
-        cell.classList.toggle('selected');
-
-        // Play selection sound
-        playSelectSound();
-
-        // Add or remove from selected numbers
         if (cell.classList.contains('selected')) {
-            const numberData = {
-                value: cell.dataset.value,
-                row: cell.dataset.row,
-                col: cell.dataset.col,
-                element: cell
-            };
-            state.selectedNumbers.push(numberData);
-        } else {
+            cell.classList.remove('selected');
+            cell.classList.remove('hover-effect');
+            
             // Remove from selected numbers
             const index = state.selectedNumbers.findIndex(n => 
                 n.row === cell.dataset.row && n.col === cell.dataset.col
@@ -238,7 +389,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (index !== -1) {
                 state.selectedNumbers.splice(index, 1);
             }
+        } else {
+            cell.classList.add('selected');
+            
+            // Add to selected numbers
+            const numberData = {
+                value: cell.dataset.value,
+                row: cell.dataset.row,
+                col: cell.dataset.col,
+                element: cell
+            };
+            state.selectedNumbers.push(numberData);
         }
+
+        // Play selection sound
+        playSelectSound();
 
         // Update hex codes when selection changes
         updateHexCodes();
@@ -284,7 +449,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // Deactivate the selection group
             selectionGroup.classList.remove('active');
+            selectionGroup.classList.remove('dragging');
             state.selectionGroupActive = false;
+            state.isDragging = false;
         }
     }
 
@@ -374,7 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dropZone = checkDropZones(touch.clientX, touch.clientY);
         if (dropZone) {
             const bucketId = dropZone.id.split('-')[1];
-            processDrop(bucketId);
+            animateNumbersToBucket(state.selectedNumbers, bucketId);
         } else {
             // Reset position if not dropped on a valid zone
             resetSelectionGroupPosition(selectionGroup);
@@ -461,8 +628,80 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Only process if we have 9 numbers selected and the selection group is being dragged
         if (state.selectedNumbers.length === 9 && data === 'selection-group') {
-            processDrop(bucketId);
+            animateNumbersToBucket(state.selectedNumbers, bucketId);
         }
+    }
+    
+    function animateNumbersToBucket(numbers, bucketId) {
+        // Get the bucket element
+        const bucketElement = document.getElementById(`bucket-${bucketId}`);
+        if (!bucketElement) return;
+        
+        // Animate the bucket opening
+        bucketElement.classList.add('opening');
+        
+        // Create a copy of the numbers array to avoid modifying the original during animation
+        const numbersCopy = [...numbers];
+        
+        // Get positions for animation
+        const bucketRect = bucketElement.getBoundingClientRect();
+        const gridRect = elements.numberGrid.getBoundingClientRect();
+        const bucketCenterX = bucketRect.left + bucketRect.width / 2;
+        const bucketCenterY = bucketRect.top + bucketRect.height / 2;
+        
+        // Hide the selection group during animation
+        const selectionGroup = document.getElementById('selection-group');
+        if (selectionGroup) {
+            selectionGroup.style.opacity = '0';
+        }
+        
+        // Animate each number to the bucket
+        numbersCopy.forEach((num, index) => {
+            // Create an animated number element
+            const animatedNumber = document.createElement('div');
+            animatedNumber.className = 'number-animation';
+            animatedNumber.textContent = num.value;
+            
+            // Position it at the original number's position
+            const rect = num.element.getBoundingClientRect();
+            animatedNumber.style.left = `${rect.left}px`;
+            animatedNumber.style.top = `${rect.top}px`;
+            
+            // Add it to the body
+            document.body.appendChild(animatedNumber);
+            
+            // Animate it to the bucket with a delay based on index
+            setTimeout(() => {
+                animatedNumber.style.transition = 'all 0.5s ease-in-out';
+                animatedNumber.style.left = `${bucketCenterX}px`;
+                animatedNumber.style.top = `${bucketCenterY}px`;
+                animatedNumber.style.opacity = '0';
+                animatedNumber.style.transform = 'scale(0.5)';
+                
+                // Remove the animated number after animation
+                setTimeout(() => {
+                    animatedNumber.remove();
+                    
+                    // If this is the last number, close the bucket and process the drop
+                    if (index === numbersCopy.length - 1) {
+                        setTimeout(() => {
+                            bucketElement.classList.remove('opening');
+                            bucketElement.classList.add('closing');
+                            
+                            // Process the drop after the bucket closes
+                            setTimeout(() => {
+                                bucketElement.classList.remove('closing');
+                                processDrop(bucketId);
+                            }, 800);
+                        }, 200);
+                    }
+                }, 500);
+            }, index * 100);
+            
+            // Remove the selection from the original number
+            num.element.classList.remove('selected');
+            num.element.classList.remove('hover-effect');
+        });
     }
     
     function processDrop(bucketId) {
@@ -477,9 +716,6 @@ document.addEventListener('DOMContentLoaded', () => {
         state.totalProgress += Math.floor(progressIncrease / 5);
         
         // Clear selected numbers
-        state.selectedNumbers.forEach(num => {
-            num.element.classList.remove('selected');
-        });
         state.selectedNumbers = [];
         
         // Update UI
@@ -493,6 +729,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Update selection group
         updateSelectionGroup();
+        
+        // Generate new numbers
+        generateNumberGrid();
     }
 
     function updateUI() {
