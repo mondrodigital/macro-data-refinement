@@ -12,22 +12,37 @@ You can try the live demo here: [Macro Data Refinement Simulator](https://userna
 
 - **Branch Country Selection**: Choose your branch country from a grid of options
 - **File Selection**: Select a file to refine from various options like PiGmy, Quirk, Enola, etc.
-- **Number Grid**: Interact with a grid of random numbers
-- **Number Selection**: Click on numbers to select them (up to 9 in a 3x3 grid)
-- **Group Selection**: When 9 numbers are selected, they can be dragged as a group
+- **Number Grid**: Interact with a grid of random numbers that wiggle and move slightly
+- **Hover Interaction**: On desktop, numbers enlarge when you hover over them with your mouse
+- **Click and Drag**: Select numbers by clicking and dragging over them (desktop)
+- **Touch Selection**: On mobile, tap numbers to select them
+- **Animated Buckets**: Watch as buckets open to receive your selected numbers with fluid animations
 - **Progress Tracking**: Watch as your refinement work increases the completion percentage
 - **Visual Effects**: Enjoy the glowing, pulsing interface with slow, deliberate animations that mimic the show
 - **Mobile Responsive**: Fully responsive design that works on desktop and mobile devices with touch support
 
 ## How to Use
 
+### Desktop
 1. **Select a Branch Country**: Click on one of the country options to begin
 2. **Choose a File to Refine**: Select which file you want to work on
 3. **Refine the Data**:
-   - Click on numbers in the grid to select them (they will enlarge and glow)
+   - Hover over numbers to see them enlarge and glow
+   - Click and hold while moving over numbers to select them (up to 9)
+   - When 9 numbers are selected, a selection box will appear
+   - Drag the entire selection to one of the buckets at the bottom
+   - Watch as the bucket opens, receives the numbers, and closes
+   - See the bucket's percentage increase and contribute to the overall completion
+
+### Mobile
+1. **Select a Branch Country**: Tap on one of the country options to begin
+2. **Choose a File to Refine**: Tap which file you want to work on
+3. **Refine the Data**:
+   - Tap on numbers to select them (they will enlarge and glow)
    - Select exactly 9 numbers (a selection box will appear around them)
    - Drag the entire selection to one of the buckets at the bottom
-   - Watch as the bucket's percentage increases and contributes to the overall completion
+   - Watch as the bucket opens, receives the numbers, and closes
+   - See the bucket's percentage increase and contribute to the overall completion
 
 ## Running Locally
 
@@ -67,14 +82,15 @@ To deploy this project to GitHub Pages:
 
 This application is built using:
 - HTML5
-- CSS3 (with slow animations and glow effects)
+- CSS3 (with animations, transitions, and glow effects)
 - JavaScript (ES6+)
-- Drag and Drop API
+- Custom drag and drop implementation
+- Touch events for mobile support
 - Node.js (for the optional server)
 
 ## Inspiration
 
-This project is inspired by the macro data refinement scenes from the Apple TV+ show "Severance", where employees perform mysterious data refinement tasks on retro-futuristic computer interfaces with slow, deliberate interactions.
+This project is inspired by the macro data refinement scenes from the Apple TV+ show "Severance", where employees perform mysterious data refinement tasks on retro-futuristic computer interfaces with slow, deliberate interactions. The wiggling numbers and hover-based interaction are directly based on the show's visual style.
 
 ## License
 
