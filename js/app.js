@@ -30,7 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
         audioPlayer: {
             isPlaying: false,
             isMuted: false,
-            volume: 0.7
+            volume: 70,
+            youtubePlayer: null,
+            youtubeReady: false,
+            youtubeVideoId: 'JRnDYB28bL8', // Severance theme YouTube video ID
+            updateInterval: null
         }
     };
 
@@ -66,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTimeDisplay: document.getElementById('current-time'),
         durationDisplay: document.getElementById('duration'),
         muteBtn: document.getElementById('mute-btn'),
-        volumeSlider: document.getElementById('volume-slider')
+        volumeSlider: document.getElementById('volume-slider'),
+        youtubeContainer: document.getElementById('youtube-player-container')
     };
 
     // Initialize the application
@@ -910,7 +915,186 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateMuteButtonIcon(volume) {
         if (volume === 0 || state.audioPlayer.isMuted) {
             elements.muteBtn.textContent = '🔇';
-        } else if (volume < 0.5) {
+        } else if (volume < 50) {
+            elements.muteBtn.textContent = '🔉';
+        } else {
+            elements.muteBtn.textContent = '🔊';
+        }
+    }
+
+    // Format time in seconds to MM:SS format
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    // YouTube API callback when API is ready
+    window.onYouTubeIframeAPIReady = function() {
+        state.audioPlayer.youtubeReady = true;
+        initYouTubePlayer();
+    };
+
+    // Initialize YouTube player
+    function initYouTubePlayer() {
+        if (!state.audioPlayer.youtubeReady) return;
+        
+        state.audioPlayer.youtubePlayer = new YT.Player('youtube-player-container', {
+            videoId: state.audioPlayer.youtubeVideoId,
+            playerVars: {
+                'autoplay': 0,
+                'controls': 0,
+                'showinfo': 0,
+                'rel': 0,
+                'iv_load_policy': 3,
+                'fs': 0,
+                'modestbranding': 1,
+                'start': 90 // Start at 1:30 to skip intro
+            },
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
+            }
+        });
+    }
+
+    // YouTube player ready event
+    function onPlayerReady(event) {
+        // Set initial volume
+        state.audioPlayer.youtubePlayer.setVolume(state.audioPlayer.volume);
+        elements.volumeSlider.value = state.audioPlayer.volume;
+        
+        // Set up music player controls
+        initMusicPlayerControls();
+        
+        // Update duration display
+        const duration = state.audioPlayer.youtubePlayer.getDuration();
+        elements.durationDisplay.textContent = formatTime(duration);
+    }
+
+    // YouTube player state change event
+    function onPlayerStateChange(event) {
+        // YT.PlayerState.ENDED = 0
+        // YT.PlayerState.PLAYING = 1
+        // YT.PlayerState.PAUSED = 2
+        if (event.data === YT.PlayerState.PLAYING) {
+            state.audioPlayer.isPlaying = true;
+            elements.playIcon.style.display = 'none';
+            elements.pauseIcon.style.display = 'block';
+            
+            // Start progress update interval
+            startProgressUpdate();
+        } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+            state.audioPlayer.isPlaying = false;
+            elements.playIcon.style.display = 'block';
+            elements.pauseIcon.style.display = 'none';
+            
+            // Stop progress update interval
+            stopProgressUpdate();
+            
+            // If ended, restart from beginning
+            if (event.data === YT.PlayerState.ENDED) {
+                state.audioPlayer.youtubePlayer.seekTo(90, true); // Restart at 1:30
+            }
+        }
+    }
+
+    // Initialize music player controls
+    function initMusicPlayerControls() {
+        // Handle play/pause button click
+        elements.playPauseBtn.addEventListener('click', togglePlayPause);
+
+        // Handle progress bar click to seek
+        elements.progressBar.addEventListener('click', (e) => {
+            if (!state.audioPlayer.youtubePlayer) return;
+            
+            const progressBar = elements.progressBar;
+            const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
+            const progressBarWidth = progressBar.offsetWidth;
+            const seekTime = (clickPosition / progressBarWidth) * 
+                (state.audioPlayer.youtubePlayer.getDuration() - 90) + 90; // Adjust for start time
+            
+            state.audioPlayer.youtubePlayer.seekTo(seekTime, true);
+        });
+
+        // Handle mute button click
+        elements.muteBtn.addEventListener('click', toggleMute);
+
+        // Handle volume slider change
+        elements.volumeSlider.addEventListener('input', (e) => {
+            if (!state.audioPlayer.youtubePlayer) return;
+            
+            const volume = parseInt(e.target.value);
+            state.audioPlayer.volume = volume;
+            state.audioPlayer.youtubePlayer.setVolume(volume);
+            
+            // Update mute button icon based on volume
+            updateMuteButtonIcon(volume);
+        });
+    }
+
+    // Start progress update interval
+    function startProgressUpdate() {
+        // Clear any existing interval
+        stopProgressUpdate();
+        
+        // Update progress every 500ms
+        state.audioPlayer.updateInterval = setInterval(() => {
+            if (!state.audioPlayer.youtubePlayer) return;
+            
+            const currentTime = state.audioPlayer.youtubePlayer.getCurrentTime();
+            const duration = state.audioPlayer.youtubePlayer.getDuration();
+            
+            // Calculate progress percentage (accounting for start time)
+            const adjustedCurrentTime = currentTime - 90;
+            const adjustedDuration = duration - 90;
+            const progressPercent = (adjustedCurrentTime / adjustedDuration) * 100;
+            
+            // Update progress bar and time display
+            elements.progressFill.style.width = `${progressPercent}%`;
+            elements.currentTimeDisplay.textContent = formatTime(currentTime);
+        }, 500);
+    }
+
+    // Stop progress update interval
+    function stopProgressUpdate() {
+        if (state.audioPlayer.updateInterval) {
+            clearInterval(state.audioPlayer.updateInterval);
+            state.audioPlayer.updateInterval = null;
+        }
+    }
+
+    // Toggle play/pause
+    function togglePlayPause() {
+        if (!state.audioPlayer.youtubePlayer) return;
+        
+        if (state.audioPlayer.isPlaying) {
+            state.audioPlayer.youtubePlayer.pauseVideo();
+        } else {
+            state.audioPlayer.youtubePlayer.playVideo();
+        }
+    }
+
+    // Toggle mute
+    function toggleMute() {
+        if (!state.audioPlayer.youtubePlayer) return;
+        
+        if (state.audioPlayer.isMuted) {
+            state.audioPlayer.youtubePlayer.unMute();
+            state.audioPlayer.youtubePlayer.setVolume(state.audioPlayer.volume);
+        } else {
+            state.audioPlayer.youtubePlayer.mute();
+        }
+        
+        state.audioPlayer.isMuted = !state.audioPlayer.isMuted;
+        updateMuteButtonIcon(state.audioPlayer.isMuted ? 0 : state.audioPlayer.volume);
+    }
+
+    // Update mute button icon based on volume
+    function updateMuteButtonIcon(volume) {
+        if (volume === 0 || state.audioPlayer.isMuted) {
+            elements.muteBtn.textContent = '🔇';
+        } else if (volume < 50) {
             elements.muteBtn.textContent = '🔉';
         } else {
             elements.muteBtn.textContent = '🔊';
