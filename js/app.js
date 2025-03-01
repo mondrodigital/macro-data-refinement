@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Application state
     const state = {
-        currentScreen: 'branch-screen',
+        currentScreen: 'name-screen',
         userName: 'Refinement Worker',
         selectedCountry: null,
         selectedFile: null,
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addEventListeners() {
-        // Name submission - keeping this code but it won't be used
+        // Name submission
         if (elements.nameSubmit) {
             elements.nameSubmit.addEventListener('click', () => {
                 handleNameSubmit();
@@ -246,17 +246,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleNameSubmit() {
         const nameInput = elements.nameInput.value.trim();
-        if (nameInput) {
+        if (nameInput && nameInput.length >= 2) {
+            // Store the name in state
             state.userName = nameInput;
-            elements.userNameDisplay.textContent = state.userName;
+            
+            // Update all instances of the username display
+            document.querySelectorAll('.user-name-display, #display-user-name').forEach(el => {
+                if (el) el.textContent = state.userName;
+            });
+            
+            // Navigate to branch selection screen
             navigateToScreen('branch-screen');
+            
+            // Play sound effect
             playSelectSound();
+            
+            // Log for debugging
+            console.log('Name submitted:', state.userName);
         } else {
-            // Shake the input field to indicate error
+            // Show error - shake the input field
             elements.nameInput.classList.add('shake');
+            
+            // Add a red border temporarily
+            elements.nameInput.style.borderColor = '#ff3333';
+            elements.nameInput.style.boxShadow = '0 0 15px rgba(255, 51, 51, 0.5)';
+            
+            // Reset styles after animation
             setTimeout(() => {
                 elements.nameInput.classList.remove('shake');
+                elements.nameInput.style.borderColor = '#00c3ff';
+                elements.nameInput.style.boxShadow = '0 0 10px rgba(0, 195, 255, 0.3)';
             }, 500);
+            
+            // Focus the input field
+            elements.nameInput.focus();
         }
     }
 
@@ -1612,6 +1635,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('div');
         container.className = 'severance-completion-container';
         
+        // Get username with fallback
+        const userName = state.userName || 'Refinement Worker';
+        console.log('Displaying completion screen for user:', userName);
+        
         // Add Lumon-style content
         container.innerHTML = `
             <div class="completion-header">
@@ -1621,7 +1648,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h1>REFINEMENT COMPLETE</h1>
             </div>
             <div class="completion-message">
-                <p>Congratulations, <span class="employee-name">${state.userName}</span>.</p>
+                <p>Congratulations, <span class="employee-name">${userName}</span>.</p>
                 <p>Your work in Macrodata Refinement has been exemplary.</p>
                 <p>The Board is pleased with your performance.</p>
                 <p class="quote">"The data has been refined to 100% completion."</p>
