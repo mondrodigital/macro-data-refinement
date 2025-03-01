@@ -370,7 +370,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 1.5s ease;
+    transition: all 0.3s ease;
     touch-action: none;
     position: relative;
     overflow: hidden;
@@ -380,17 +380,7 @@ body {
     background-color: rgba(0, 195, 255, 0.2);
     box-shadow: 0 0 15px #00c3ff, inset 0 0 10px #00c3ff;
     transform: scale(1.1);
-    transition-duration: 0.8s;
-}
-
-.bucket-drop-zone.opening {
-    height: 80px;
-    transition: height 0.8s ease-out;
-}
-
-.bucket-drop-zone.closing {
-    height: 40px;
-    transition: height 0.8s ease-in;
+    transition-duration: 0.3s;
 }
 
 /* Dragging */
@@ -408,6 +398,14 @@ body {
     text-shadow: 0 0 10px #fff, 0 0 20px #00c3ff;
     z-index: 30;
     pointer-events: none;
+    background-color: rgba(0, 24, 36, 0.3);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px #00c3ff;
 }
 
 /* Horizontal lines above and below grid */

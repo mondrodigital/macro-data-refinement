@@ -649,17 +649,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const bucketElement = document.getElementById(`bucket-${bucketId}`);
         if (!bucketElement) return;
         
-        // Animate the bucket opening
-        bucketElement.classList.add('opening');
-        
         // Create a copy of the numbers array to avoid modifying the original during animation
         const numbersCopy = [...numbers];
         
         // Get positions for animation
         const bucketRect = bucketElement.getBoundingClientRect();
-        const gridRect = elements.numberGrid.getBoundingClientRect();
         const bucketCenterX = bucketRect.left + bucketRect.width / 2;
         const bucketCenterY = bucketRect.top + bucketRect.height / 2;
+        
+        // Highlight the bucket briefly
+        bucketElement.classList.add('highlight');
+        setTimeout(() => {
+            bucketElement.classList.remove('highlight');
+        }, 300);
         
         // Animate each number to the bucket with a delay based on index
         numbersCopy.forEach((num, index) => {
@@ -688,18 +690,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
                     animatedNumber.remove();
                     
-                    // If this is the last number, close the bucket and process the drop
+                    // If this is the last number, process the drop
                     if (index === numbersCopy.length - 1) {
-                        setTimeout(() => {
-                            bucketElement.classList.remove('opening');
-                            bucketElement.classList.add('closing');
-                            
-                            // Process the drop after the bucket closes
-                            setTimeout(() => {
-                                bucketElement.classList.remove('closing');
-                                processDrop(bucketId);
-                            }, 800);
-                        }, 200);
+                        processDrop(bucketId);
                     }
                 }, 500);
             }, index * 100);
