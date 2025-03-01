@@ -1444,6 +1444,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="waffle-party-notice">
                     <h2>YOU ARE ELIGIBLE FOR A WAFFLE PARTY</h2>
                     <p>Please proceed to the break room to receive your reward.</p>
+                    <div class="dancing-waffle">
+                        <div class="waffle"></div>
+                    </div>
                 </div>
             </div>
             <div class="completion-actions">
@@ -1604,6 +1607,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 100% { box-shadow: 0 0 15px #00c3ff inset; }
             }
             
+            /* Dancing waffle styles */
+            .dancing-waffle {
+                width: 100px;
+                height: 100px;
+                margin: 20px auto 10px;
+                position: relative;
+                animation: waffle-dance 2s infinite alternate ease-in-out;
+            }
+            
+            .waffle {
+                width: 100%;
+                height: 100%;
+                background-color: #e6c07b;
+                border-radius: 10px;
+                position: relative;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+                transform-style: preserve-3d;
+            }
+            
+            .waffle:before, .waffle:after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(45deg, transparent 25%, rgba(101, 67, 33, 0.2) 25%, rgba(101, 67, 33, 0.2) 50%, transparent 50%, transparent 75%, rgba(101, 67, 33, 0.2) 75%);
+                background-size: 20px 20px;
+                border-radius: 10px;
+            }
+            
+            .waffle:after {
+                background: linear-gradient(-45deg, transparent 25%, rgba(101, 67, 33, 0.2) 25%, rgba(101, 67, 33, 0.2) 50%, transparent 50%, transparent 75%, rgba(101, 67, 33, 0.2) 75%);
+                background-size: 20px 20px;
+            }
+            
+            @keyframes waffle-dance {
+                0% { transform: rotate(-15deg); }
+                50% { transform: rotate(0deg) scale(1.05); }
+                100% { transform: rotate(15deg); }
+            }
+            
             /* Mobile adjustments */
             @media (max-width: 768px) {
                 .severance-completion-container {
@@ -1629,6 +1674,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 .severance-btn {
                     width: 100%;
+                }
+                
+                .dancing-waffle {
+                    width: 80px;
+                    height: 80px;
+                    margin: 15px auto 5px;
                 }
             }
         `;
@@ -1843,6 +1894,26 @@ document.addEventListener('DOMContentLoaded', () => {
         completionSound.volume = 0.5;
         completionSound.src = 'audio/congrats.mp3'; // Make sure this file exists in your audio folder
         
+        // Sync waffle dance with audio beat
+        const syncWaffleDance = () => {
+            const waffle = document.querySelector('.dancing-waffle');
+            if (waffle && completionSound && !completionSound.paused) {
+                // Adjust animation speed based on audio playback
+                const animationDuration = 1 + (Math.sin(completionSound.currentTime) * 0.5);
+                waffle.style.animationDuration = `${animationDuration}s`;
+                
+                // Add a subtle pulse effect synchronized with the beat
+                if (Math.floor(completionSound.currentTime * 2) % 2 === 0) {
+                    waffle.style.transform = 'scale(1.05)';
+                } else {
+                    waffle.style.transform = 'scale(1)';
+                }
+            }
+        };
+        
+        // Update waffle dance animation periodically
+        const waffleDanceInterval = setInterval(syncWaffleDance, 300);
+        
         // Set up a timer to stop the sound after 2 minutes (120 seconds)
         const soundTimeout = setTimeout(() => {
             if (completionSound && !completionSound.paused) {
@@ -1900,8 +1971,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 completionSound.currentTime = 0;
             }
             
-            // Clear the timeout
+            // Clear the timeout and intervals
             clearTimeout(soundTimeout);
+            clearInterval(waffleDanceInterval);
             
             // Remove the event listener
             overlay.removeEventListener('remove', cleanupFunction);
