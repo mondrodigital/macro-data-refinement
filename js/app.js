@@ -118,8 +118,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function detectMobile() {
-        state.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        // Use multiple methods to detect mobile
+        const userAgentCheck = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const dimensionCheck = window.innerWidth <= 768;
+        const touchCheck = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+        
+        // Determine if this is a mobile device based on multiple factors
+        state.isMobile = userAgentCheck || (dimensionCheck && touchCheck);
+        
+        // Add a class to the body element
         document.body.classList.toggle('mobile-device', state.isMobile);
+        
+        console.log(`Mobile detection: UA: ${userAgentCheck}, Dimensions: ${dimensionCheck}, Touch: ${touchCheck}. Result: ${state.isMobile}`);
     }
     
     function ensureViewportMeta() {
@@ -133,6 +143,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Set the viewport content with proper scaling
         viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+        
+        // Add additional meta tags to prevent scaling
+        let userScalableMeta = document.querySelector('meta[name="user-scalable"]');
+        if (!userScalableMeta) {
+            userScalableMeta = document.createElement('meta');
+            userScalableMeta.name = 'user-scalable';
+            userScalableMeta.content = 'no';
+            document.head.appendChild(userScalableMeta);
+        }
     }
 
     function addEventListeners() {
@@ -2662,14 +2681,43 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleResize() {
         // Only regenerate the grid if we're on the grid screen
         if (state.currentScreen === 'grid-screen') {
+            // Clear any pending regeneration to avoid race conditions
+            if (window.pendingGridRegeneration) {
+                clearTimeout(window.pendingGridRegeneration);
+            }
+            
             // Small delay to ensure the resize is complete
-            setTimeout(() => {
+            window.pendingGridRegeneration = setTimeout(() => {
+                // Store previous selected numbers before regenerating
+                const previousSelectedNumbers = state.selectedNumbers.slice();
+                
+                // Regenerate the grid
                 generateNumberGrid();
                 
                 // Update UI elements that might need repositioning
                 updateUI();
                 
-                console.log('Window resized, grid regenerated');
+                // After grid is generated, reapply any selected numbers if possible
+                if (previousSelectedNumbers.length > 0) {
+                    console.log('Attempting to restore selected numbers:', previousSelectedNumbers);
+                    // Find cells with the same position as previously selected
+                    previousSelectedNumbers.forEach(prevNum => {
+                        const cells = document.querySelectorAll('.number-cell');
+                        cells.forEach(cell => {
+                            if (cell.dataset.row == prevNum.row && cell.dataset.col == prevNum.col) {
+                                cell.classList.add('selected');
+                                state.selectedNumbers.push({
+                                    element: cell,
+                                    value: parseInt(cell.textContent),
+                                    row: parseInt(cell.dataset.row),
+                                    col: parseInt(cell.dataset.col)
+                                });
+                            }
+                        });
+                    });
+                }
+                
+                console.log('Window resized, grid regenerated with dimension checks');
             }, 300);
         }
     }
