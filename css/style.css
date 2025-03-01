@@ -604,7 +604,7 @@ body {
         height: -webkit-fill-available;
         max-height: none;
         border-width: 1px;
-        padding: 5px 5px 70px;
+        padding: 2px 2px 50px;
         margin: 0;
         position: fixed;
         top: 0;
@@ -616,40 +616,42 @@ body {
     }
 
     .status-bar {
-        padding: 2px 0;
-        margin-bottom: 2px;
+        padding: 1px 0;
+        margin-bottom: 1px;
         transform: scale(0.85);
         transform-origin: top center;
         flex-shrink: 0;
     }
 
     .total-progress-bar {
-        height: 25px;
+        height: 20px;
     }
 
     .project-name, .progress-text {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
 
     .header-lumon-logo {
-        width: 30px;
-        height: 30px;
-        margin-left: 10px;
+        width: 25px;
+        height: 25px;
+        margin-left: 8px;
     }
 
-    /* Ensure grid fits in viewport */
+    /* Make grid fill entire screen */
     .number-grid {
         height: auto;
         flex: 1;
         min-height: 0;
-        margin: 2px 0;
-        padding: 2px;
+        margin: 1px 0;
+        padding: 1px;
+        overflow: hidden;
     }
 
     .grid-container-inner {
         grid-template-columns: repeat(8, 1fr);
         gap: 3px;
         height: 100%;
+        width: 100%;
     }
 
     .number-cell {
@@ -665,9 +667,9 @@ body {
         bottom: 0;
         left: 0;
         right: 0;
-        padding: 5px 5px 10px;
+        padding: 2px 2px 5px;
         margin: 0;
-        gap: 5px;
+        gap: 4px;
         background-color: #001824;
         z-index: 100;
         flex-shrink: 0;
@@ -675,75 +677,89 @@ body {
 
     .bucket {
         max-width: none;
-        min-height: 45px;
+        min-height: 40px;
     }
 
     .bucket-drop-zone {
-        height: 35px;
-        font-size: 0.9rem;
+        height: 32px;
+        font-size: 0.85rem;
     }
 
     .bucket-progress {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
     }
 
-    /* Hide music player on mobile */
+    /* Hide music player on mobile - with more specific selectors */
     .music-player,
-    .floating-music-btn {
+    .floating-music-btn,
+    .slide-out-player,
+    .audio-player,
+    .player-controls,
+    .music-control {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        position: absolute !important;
+        pointer-events: none !important;
+        z-index: -999 !important;
+        right: -9999px !important;
+    }
+
+    /* Hide ALL music player related elements */
+    [class*="music"],
+    [class*="player"],
+    [class*="audio"],
+    [id*="player"],
+    [id*="music"],
+    [id*="audio"] {
         display: none !important;
     }
 
     /* Adjust grid border lines */
     .grid-border-line {
-        margin: 2px 0;
+        margin: 1px 0;
         flex-shrink: 0;
+        height: 1px;
     }
 
     /* Hide hex codes on mobile */
     .hex-codes-container {
         display: none;
     }
+    
+    /* Improve grid layout - modify grid to fill space */
+    .grid-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .number-grid .grid-container-inner {
+        height: 100%;
+        max-height: none;
+    }
 }
 
 @media (max-width: 480px) {
     .app-container {
-        padding: 2px 2px 60px;
+        padding: 1px 1px 45px;
     }
 
     .status-bar {
         transform: scale(0.8);
-    }
-
-    .number-grid {
-        margin: 1px 0;
+        margin-bottom: 1px;
     }
 
     .grid-container-inner {
         gap: 2px;
     }
 
-    .bucket {
-        min-height: 40px;
-    }
-
-    .bucket-drop-zone {
-        height: 30px;
+    .number-cell {
         font-size: 0.8rem;
-    }
-}
-
-@media (max-height: 600px) {
-    .app-container {
-        padding: 1px 2px 50px;
-    }
-
-    .status-bar {
-        transform: scale(0.75);
-        margin-bottom: 1px;
-    }
-
-    .number-grid {
-        margin: 1px 0;
     }
 
     .bucket {
@@ -751,12 +767,32 @@ body {
     }
 
     .bucket-drop-zone {
-        height: 25px;
+        height: 28px;
         font-size: 0.75rem;
+    }
+}
+
+@media (max-height: 600px) {
+    .app-container {
+        padding: 1px 1px 40px;
+    }
+
+    .status-bar {
+        transform: scale(0.7);
+        margin-bottom: 1px;
+    }
+
+    .bucket {
+        min-height: 30px;
+    }
+
+    .bucket-drop-zone {
+        height: 22px;
+        font-size: 0.7rem;
     }
 
     .bucket-progress {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
     }
 }
 
