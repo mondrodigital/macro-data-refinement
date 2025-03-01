@@ -177,16 +177,32 @@ document.addEventListener('DOMContentLoaded', () => {
             }, { passive: false });
         });
 
-        // Bucket drop zones
+        // Bucket drop zones - add click event to place numbers in buckets
         elements.bucketDropZones.forEach(zone => {
             zone.addEventListener('dragover', handleDragOver);
             zone.addEventListener('dragleave', handleDragLeave);
             zone.addEventListener('drop', handleDrop);
             
+            // Add click event to place numbers in buckets
+            zone.addEventListener('click', () => {
+                if (state.selectedNumbers.length > 0) {
+                    const bucketId = zone.id.split('-')[1];
+                    animateNumbersToBucket(state.selectedNumbers, bucketId);
+                }
+            });
+            
             // Add touch events for mobile
             zone.addEventListener('touchmove', (e) => {
                 e.preventDefault(); // Prevent scrolling when over drop zones
                 handleTouchMove(e, zone);
+            }, { passive: false });
+            
+            zone.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                if (state.selectedNumbers.length > 0) {
+                    const bucketId = zone.id.split('-')[1];
+                    animateNumbersToBucket(state.selectedNumbers, bucketId);
+                }
             }, { passive: false });
         });
         
@@ -204,6 +220,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add mousemove event to the number grid for the magnifying glass effect
             elements.numberGrid.addEventListener('mousemove', handleNumberGridMouseMove);
             elements.numberGrid.addEventListener('mouseleave', handleNumberGridMouseLeave);
+        } else {
+            // Mobile-specific touch events for drag selection
+            document.addEventListener('touchstart', handleDocumentTouchStart);
+            document.addEventListener('touchmove', handleDocumentTouchMove);
+            document.addEventListener('touchend', handleDocumentTouchEnd);
         }
         
         // Add keyboard event listener for number keys to select buckets
@@ -242,8 +263,9 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.numberGrid.innerHTML = '';
 
         // Generate random numbers for the grid
-        const rows = 10;
-        const cols = 14;
+        // Adjust grid size for mobile
+        const rows = state.isMobile ? 8 : 10;
+        const cols = state.isMobile ? (window.innerWidth < 480 ? 8 : 10) : 14;
 
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
@@ -439,8 +461,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleNumberSelection(cell) {
-        // If already have 9 selections and this one isn't selected, don't allow more
-        if (state.selectedNumbers.length >= 9 && !cell.classList.contains('selected')) {
+        // For mobile, allow more selections for better usability
+        const maxSelections = state.isMobile ? 12 : 9;
+        
+        // If already have max selections and this one isn't selected, don't allow more
+        if (state.selectedNumbers.length >= maxSelections && !cell.classList.contains('selected')) {
             return;
         }
 
@@ -475,13 +500,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update hex codes when selection changes
         updateHexCodes();
         
-        // Check if we have 9 selections to show keyboard hint
+        // Check if we have enough selections to show keyboard hint
         updateSelectionGroup();
     }
 
     function updateSelectionGroup() {
-        // Check if we have 9 numbers selected
-        if (state.selectedNumbers.length === 9) {
+        // Check if we have enough numbers selected
+        const requiredSelections = state.isMobile ? 12 : 9;
+        if (state.selectedNumbers.length === requiredSelections) {
             // Show keyboard shortcut hint if this is the first time
             if (!state.hasShownKeyboardHint) {
                 showKeyboardShortcutHint();
@@ -508,8 +534,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = e.dataTransfer.getData('text/plain');
         const bucketId = e.target.id.split('-')[1];
 
-        // Only process if we have 9 numbers selected
-        if (state.selectedNumbers.length === 9) {
+        // Process if we have any numbers selected
+        if (state.selectedNumbers.length > 0) {
             animateNumbersToBucket(state.selectedNumbers, bucketId);
         }
     }
@@ -532,16 +558,90 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // Mobile touch event handlers
+    function handleDocumentTouchStart(e) {
+        if (state.currentScreen !== 'grid-screen') return;
+        
+        state.touchIdentifier = e.changedTouches[0].identifier;
+        state.mouseDown = true; // Use the same flag for touch and mouse
+    }
+    
     function handleDocumentTouchMove(e) {
         // Prevent default to avoid scrolling issues
         if (state.currentScreen === 'grid-screen') {
             e.preventDefault();
+            
+            // Find the touch with the stored identifier
+            let touch = null;
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === state.touchIdentifier) {
+                    touch = e.changedTouches[i];
+                    break;
+                }
+            }
+            
+            if (touch && state.mouseDown) {
+                // Check if touch is over a number cell
+                const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (element && element.classList.contains('number-cell')) {
+                    // If we're dragging over a cell, select it
+                    if (!element.classList.contains('selected')) {
+                        handleNumberSelection(element);
+                    }
+                }
+                
+                // Check if touch is over a bucket
+                elements.bucketDropZones.forEach(zone => {
+                    const rect = zone.getBoundingClientRect();
+                    if (
+                        touch.clientX >= rect.left && 
+                        touch.clientX <= rect.right && 
+                        touch.clientY >= rect.top && 
+                        touch.clientY <= rect.bottom
+                    ) {
+                        zone.classList.add('highlight');
+                    } else {
+                        zone.classList.remove('highlight');
+                    }
+                });
+            }
         }
-
     }
     
     function handleDocumentTouchEnd(e) {
-        // Touch end handler
+        if (state.currentScreen !== 'grid-screen') return;
+        
+        // Find the touch with the stored identifier
+        let touch = null;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === state.touchIdentifier) {
+                touch = e.changedTouches[i];
+                break;
+            }
+        }
+        
+        if (touch) {
+            // Check if touch ended over a bucket
+            elements.bucketDropZones.forEach(zone => {
+                zone.classList.remove('highlight');
+                
+                const rect = zone.getBoundingClientRect();
+                if (
+                    touch.clientX >= rect.left && 
+                    touch.clientX <= rect.right && 
+                    touch.clientY >= rect.top && 
+                    touch.clientY <= rect.bottom
+                ) {
+                    if (state.selectedNumbers.length > 0) {
+                        const bucketId = zone.id.split('-')[1];
+                        animateNumbersToBucket(state.selectedNumbers, bucketId);
+                    }
+                }
+            });
+        }
+        
+        state.mouseDown = false;
+        state.touchIdentifier = null;
     }
     
     function animateNumbersToBucket(numbers, bucketId) {
@@ -786,7 +886,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const hint = document.createElement('div');
         hint.id = 'keyboard-hint';
         hint.className = 'keyboard-shortcut-hint';
-        hint.innerHTML = 'Press keys <span>1-5</span> to send to corresponding bucket';
+        
+        // Different hint text for mobile vs desktop
+        if (state.isMobile) {
+            hint.innerHTML = 'Tap on a <span>bucket</span> to send numbers';
+        } else {
+            hint.innerHTML = 'Press keys <span>1-5</span> to send to corresponding bucket';
+        }
         
         // Add to the grid screen
         const gridScreen = document.getElementById('grid-screen');
