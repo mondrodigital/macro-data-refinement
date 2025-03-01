@@ -274,19 +274,29 @@ document.addEventListener('DOMContentLoaded', () => {
         let rows, cols;
         
         if (state.isMobile) {
-            // More responsive grid sizing based on screen width
+            // More responsive grid sizing based on screen width and height
+            const screenHeight = window.innerHeight;
+            
             if (window.innerWidth <= 320) {
-                rows = 7;
+                rows = 6;
                 cols = 7;
             } else if (window.innerWidth <= 375) {
                 rows = 7;
-                cols = 8;
+                cols = 7;
             } else if (window.innerWidth <= 480) {
-                rows = 8;
+                rows = 7;
                 cols = 8;
             } else {
                 rows = 8;
-                cols = 10;
+                cols = 9;
+            }
+            
+            // Further reduce rows for very short screens
+            if (screenHeight < 600) {
+                rows = Math.min(rows, 6);
+            }
+            if (screenHeight < 500) {
+                rows = Math.min(rows, 5);
             }
         } else {
             // Desktop sizing
@@ -302,6 +312,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Clear selected numbers
         state.selectedNumbers = [];
+        
+        // Log grid dimensions for debugging
+        console.log(`Grid generated with ${rows} rows and ${cols} columns. Mobile: ${state.isMobile}, Screen: ${window.innerWidth}x${window.innerHeight}`);
     }
     
     // Function to create a single number cell
@@ -997,6 +1010,12 @@ document.addEventListener('DOMContentLoaded', () => {
             originalPlayer.style.display = 'none';
         }
         
+        // Don't create music player on mobile devices
+        if (state.isMobile) {
+            console.log('Mobile device detected, skipping music player creation');
+            return null;
+        }
+        
         // Create the slide-out player container
         const slideOutPlayer = document.createElement('div');
         slideOutPlayer.className = 'slide-out-player';
@@ -1020,7 +1039,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.body.appendChild(slideOutPlayer);
         
-        // Create a floating music button for mobile
+        // Create a floating music button only for desktop
         const floatingMusicBtn = document.createElement('button');
         floatingMusicBtn.className = 'floating-music-btn';
         floatingMusicBtn.innerHTML = '<i class="fas fa-music"></i>';
@@ -1750,34 +1769,94 @@ document.addEventListener('DOMContentLoaded', () => {
             /* Mobile adjustments */
             @media (max-width: 768px) {
                 .severance-completion-container {
-                    padding: 20px;
+                    padding: 15px;
+                    width: 95%;
+                    max-height: 90vh;
+                    overflow-y: auto;
                 }
                 
                 .completion-header h1 {
-                    font-size: 22px;
+                    font-size: 20px;
                 }
                 
                 .completion-message {
-                    font-size: 16px;
+                    font-size: 14px;
+                    margin-bottom: 15px;
                 }
                 
                 .waffle-party-notice h2 {
-                    font-size: 18px;
+                    font-size: 16px;
                 }
                 
                 .completion-actions {
                     flex-direction: column;
-                    gap: 15px;
+                    gap: 10px;
                 }
                 
                 .severance-btn {
                     width: 100%;
+                    padding: 10px;
+                    font-size: 14px;
                 }
                 
                 .dancing-waffle {
-                    width: 80px;
-                    height: 80px;
-                    margin: 15px auto 5px;
+                    width: 70px;
+                    height: 70px;
+                    margin: 10px auto 5px;
+                }
+                
+                .lumon-logo {
+                    width: 60px;
+                    height: 60px;
+                    margin: 0 auto 10px;
+                }
+                
+                .ceiling-lights {
+                    height: 60px;
+                }
+            }
+            
+            /* Small phones */
+            @media (max-width: 375px) {
+                .severance-completion-container {
+                    padding: 10px;
+                }
+                
+                .completion-header h1 {
+                    font-size: 18px;
+                }
+                
+                .completion-message {
+                    font-size: 13px;
+                    line-height: 1.4;
+                }
+                
+                .waffle-party-notice {
+                    margin: 15px 0;
+                    padding: 10px;
+                }
+                
+                .waffle-party-notice h2 {
+                    font-size: 14px;
+                }
+                
+                .dancing-waffle {
+                    width: 60px;
+                    height: 60px;
+                }
+                
+                .lumon-logo {
+                    width: 50px;
+                    height: 50px;
+                }
+                
+                .ceiling-lights {
+                    height: 40px;
+                }
+                
+                .quote {
+                    margin: 10px 0;
+                    padding: 5px 10px;
                 }
             }
         `;

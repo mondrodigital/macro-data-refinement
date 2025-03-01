@@ -432,13 +432,15 @@ body {
         height: 100vh;
         max-height: none;
         border-width: 1px;
-        padding: 10px;
+        padding: 10px 10px 15px;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
     
     .header-text {
         font-size: 1.5rem;
-        margin: 10px 0 15px;
+        margin: 5px 0 10px;
     }
     
     .grid-container {
@@ -455,14 +457,15 @@ body {
         font-size: 0.9rem;
         flex-direction: column;
         align-items: flex-start;
-        gap: 5px;
+        gap: 3px;
         margin-bottom: 5px;
+        padding: 5px 0;
     }
     
     .progress-info {
         width: 100%;
         justify-content: space-between;
-        margin-top: 5px;
+        margin-top: 3px;
     }
     
     .project-name {
@@ -474,10 +477,11 @@ body {
     }
     
     .number-grid {
-        height: 280px;
+        height: 260px;
         gap: 6px;
         grid-template-columns: repeat(10, 1fr);
-        margin-bottom: 10px;
+        margin-bottom: 5px;
+        flex: 0 0 auto;
     }
     
     .number-cell {
@@ -488,13 +492,15 @@ body {
     
     .bucket {
         width: 18%;
-        margin-bottom: 5px;
-        height: 70px;
+        margin-bottom: 0;
+        height: 65px;
     }
     
     .buckets {
         justify-content: space-between;
         padding: 0 5px;
+        margin-top: auto;
+        flex: 0 0 auto;
     }
     
     .bucket-progress-container {
@@ -509,22 +515,43 @@ body {
         height: 100vh;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        display: flex;
+        flex-direction: column;
     }
     
     .hex-codes {
         font-size: 0.8rem;
-        margin-top: 5px;
+        margin: 3px 0;
+    }
+    
+    /* Hide music player elements on mobile */
+    .floating-music-btn,
+    .slide-out-player {
+        display: none !important;
+    }
+    
+    /* Ensure grid screen uses full height */
+    #grid-screen {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        justify-content: space-between;
+    }
+    
+    /* Adjust bucket drop zone height */
+    .bucket-drop-zone {
+        height: 35px;
     }
 }
 
 @media (max-width: 480px) {
     .app-container {
-        padding: 5px;
+        padding: 5px 5px 10px;
     }
     
     .header-text {
         font-size: 1.3rem;
-        margin: 8px 0 12px;
+        margin: 5px 0 8px;
     }
     
     .grid-container {
@@ -533,11 +560,11 @@ body {
     
     .bucket {
         width: 18%;
-        height: 60px;
+        height: 55px;
     }
     
     .number-grid {
-        height: 240px;
+        height: 220px;
         gap: 4px;
         grid-template-columns: repeat(8, 1fr);
     }
@@ -582,12 +609,17 @@ body {
     .hex-codes {
         font-size: 0.7rem;
     }
+    
+    /* Adjust bucket drop zone height */
+    .bucket-drop-zone {
+        height: 30px;
+    }
 }
 
 /* Small phones */
 @media (max-width: 375px) {
     .number-grid {
-        height: 220px;
+        height: 200px;
         gap: 3px;
     }
     
@@ -599,7 +631,7 @@ body {
     
     .bucket {
         width: 18%;
-        height: 55px;
+        height: 50px;
     }
     
     .bucket-label {
@@ -608,14 +640,19 @@ body {
     
     .header-text {
         font-size: 1.2rem;
-        margin: 5px 0 10px;
+        margin: 3px 0 6px;
+    }
+    
+    /* Adjust bucket drop zone height */
+    .bucket-drop-zone {
+        height: 25px;
     }
 }
 
 /* Extra small phones */
 @media (max-width: 320px) {
     .number-grid {
-        height: 200px;
+        height: 180px;
     }
     
     .number-cell {
@@ -625,7 +662,12 @@ body {
     }
     
     .bucket {
-        height: 50px;
+        height: 45px;
+    }
+    
+    /* Adjust bucket drop zone height */
+    .bucket-drop-zone {
+        height: 22px;
     }
 }
 
