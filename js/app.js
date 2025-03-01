@@ -742,6 +742,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = parseInt(num.row);
             const col = parseInt(num.col);
             
+            // Remove the old cell from the DOM if it still exists
+            if (num.element && num.element.parentNode) {
+                num.element.parentNode.removeChild(num.element);
+            }
+            
             // Create a new cell at the same position
             const newCell = createNumberCell(row, col);
             
@@ -1049,6 +1054,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 align-items: center;
                 justify-content: center;
                 transition: all 0.3s ease;
+                -webkit-tap-highlight-color: rgba(0, 195, 255, 0.3);
             }
             
             .player-controls button:hover {
@@ -1111,37 +1117,117 @@ document.addEventListener('DOMContentLoaded', () => {
                     transform: none;
                     width: 220px;
                 }
+                
+                .player-controls button {
+                    width: 48px;
+                    height: 48px;
+                    font-size: 18px;
+                }
+                
+                .slide-out-player h3 {
+                    font-size: 16px;
+                    margin-bottom: 10px;
+                }
             }
         `;
         
         document.head.appendChild(style);
         
-        // Set up audio functionality
-        let audio = document.querySelector('audio');
+        // Set up audio functionality with better mobile support
+        let audio;
+        
+        // Try to get existing audio element or create a new one
+        audio = document.querySelector('audio');
         if (!audio) {
-            audio = new Audio('audio/music.mp3');
+            audio = new Audio();
+            audio.id = 'background-music';
             audio.loop = true;
+            audio.preload = 'auto';
+            
+            // Add the audio element to the DOM (needed for iOS)
+            document.body.appendChild(audio);
+            
+            // Set the source after appending to DOM
+            audio.src = 'audio/music.mp3';
         }
         
-        // Add event listeners for the player controls
+        // Add event listeners for the player controls with both click and touch events
         const playPauseBtn = slideOutPlayer.querySelector('.play-pause-btn');
-        playPauseBtn.addEventListener('click', function() {
-            if (audio.paused) {
-                audio.play();
-                this.innerHTML = '<i class="fas fa-pause"></i>';
-            } else {
-                audio.pause();
-                this.innerHTML = '<i class="fas fa-play"></i>';
-            }
-        });
         
+        // Function to handle play/pause
+        const togglePlayPause = function(e) {
+            // Prevent default behavior for touch events
+            if (e) e.preventDefault();
+            
+            // iOS requires user interaction to play audio
+            try {
+                if (audio.paused) {
+                    // Create a promise to play the audio
+                    const playPromise = audio.play();
+                    
+                    // Handle the promise to catch any errors
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            // Playback started successfully
+                            this.innerHTML = '<i class="fas fa-pause"></i>';
+                            console.log('Audio playback started');
+                        }).catch(error => {
+                            // Auto-play was prevented
+                            console.error('Audio playback failed:', error);
+                            // Show a message to the user
+                            const message = document.createElement('div');
+                            message.className = 'audio-message';
+                            message.textContent = 'Tap again to play music';
+                            message.style.position = 'absolute';
+                            message.style.bottom = '-20px';
+                            message.style.left = '0';
+                            message.style.width = '100%';
+                            message.style.textAlign = 'center';
+                            message.style.color = '#00c3ff';
+                            message.style.fontSize = '12px';
+                            this.parentNode.appendChild(message);
+                            
+                            // Remove the message after 3 seconds
+                            setTimeout(() => {
+                                if (message.parentNode) {
+                                    message.parentNode.removeChild(message);
+                                }
+                            }, 3000);
+                        });
+                    }
+                } else {
+                    audio.pause();
+                    this.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            } catch (e) {
+                console.error('Error toggling audio:', e);
+            }
+        };
+        
+        // Add both click and touch events
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        playPauseBtn.addEventListener('touchstart', togglePlayPause, { passive: false });
+        
+        // Function to handle mute/unmute
         const muteBtn = slideOutPlayer.querySelector('.mute-btn');
-        muteBtn.addEventListener('click', function() {
-            audio.muted = !audio.muted;
-            this.innerHTML = audio.muted ? 
-                '<i class="fas fa-volume-mute"></i>' : 
-                '<i class="fas fa-volume-up"></i>';
-        });
+        
+        const toggleMute = function(e) {
+            // Prevent default behavior for touch events
+            if (e) e.preventDefault();
+            
+            try {
+                audio.muted = !audio.muted;
+                this.innerHTML = audio.muted ? 
+                    '<i class="fas fa-volume-mute"></i>' : 
+                    '<i class="fas fa-volume-up"></i>';
+            } catch (e) {
+                console.error('Error toggling mute:', e);
+            }
+        };
+        
+        // Add both click and touch events
+        muteBtn.addEventListener('click', toggleMute);
+        muteBtn.addEventListener('touchstart', toggleMute, { passive: false });
         
         // Add Font Awesome if it's not already included
         if (!document.querySelector('link[href*="font-awesome"]')) {
@@ -1150,6 +1236,46 @@ document.addEventListener('DOMContentLoaded', () => {
             fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
             document.head.appendChild(fontAwesome);
         }
+        
+        // Update progress bar (simplified for mobile)
+        const progressFill = slideOutPlayer.querySelector('.progress-fill');
+        const currentTimeDisplay = slideOutPlayer.querySelector('.current-time');
+        const durationDisplay = slideOutPlayer.querySelector('.duration');
+        
+        // Update progress bar every second
+        const updateProgressInterval = setInterval(() => {
+            if (!audio.paused) {
+                const progress = (audio.currentTime / audio.duration) * 100 || 0;
+                progressFill.style.width = `${progress}%`;
+                
+                // Format time displays
+                currentTimeDisplay.textContent = formatTime(audio.currentTime);
+                durationDisplay.textContent = formatTime(audio.duration);
+            }
+        }, 1000);
+        
+        // Format time function (converts seconds to MM:SS format)
+        function formatTime(seconds) {
+            if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
+            
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+        
+        // Set initial volume
+        audio.volume = 0.7;
+        
+        // Handle audio loading events
+        audio.addEventListener('loadedmetadata', () => {
+            durationDisplay.textContent = formatTime(audio.duration);
+        });
+        
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            clearInterval(updateProgressInterval);
+            audio.pause();
+        });
         
         return slideOutPlayer;
     }
