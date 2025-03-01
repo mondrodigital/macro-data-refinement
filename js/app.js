@@ -1663,7 +1663,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 height: 100px;
                 margin: 20px auto 10px;
                 position: relative;
-                animation: waffle-dance 2s infinite alternate ease-in-out;
+                animation: waffle-dance 3s infinite ease-in-out;
             }
             
             .waffle {
@@ -1682,9 +1682,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             @keyframes waffle-dance {
-                0% { transform: rotate(-15deg); }
-                50% { transform: rotate(0deg) scale(1.05); }
-                100% { transform: rotate(15deg); }
+                0% { transform: rotate(-10deg); }
+                50% { transform: rotate(10deg); }
+                100% { transform: rotate(-10deg); }
             }
             
             /* Mobile adjustments */
@@ -1968,16 +1968,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const syncWaffleDance = () => {
             const waffle = document.querySelector('.dancing-waffle');
             if (waffle && completionSound && !completionSound.paused) {
-                // Adjust animation speed based on audio playback
-                const animationDuration = 1 + (Math.sin(completionSound.currentTime) * 0.5);
-                waffle.style.animationDuration = `${animationDuration}s`;
+                // Keep a consistent animation speed
+                waffle.style.animationDuration = '3s';
                 
-                // Add a subtle pulse effect synchronized with the beat
-                if (Math.floor(completionSound.currentTime * 2) % 2 === 0) {
-                    waffle.style.transform = 'scale(1.05)';
-                } else {
-                    waffle.style.transform = 'scale(1)';
-                }
+                // Remove the scaling effect that was making it jerky
+                waffle.style.transform = '';
             }
         };
         
