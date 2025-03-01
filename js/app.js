@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         numberGrid: document.getElementById('number-grid'),
         selectedNumbersContainer: document.getElementById('selected-numbers'),
         currentFile: document.getElementById('current-file'),
-        totalProgress: document.getElementById('total-progress'),
+        totalProgressBar: document.getElementById('total-progress'),
+        progressText: document.querySelector('.progress-text'),
         bucketDropZones: document.querySelectorAll('.bucket-drop-zone'),
         bucketProgress: document.querySelectorAll('[id^="bucket-"][id$="-progress"]'),
         hexCode1: document.getElementById('hex-code-1'),
@@ -889,15 +890,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Update total progress
-        if (elements.totalProgress) {
-            elements.totalProgress.textContent = `${state.totalProgress}% Complete`;
+        // Update total progress text
+        if (elements.progressText) {
+            elements.progressText.textContent = `${state.totalProgress}% Complete`;
         }
         
         // Update total progress bar fill
-        const totalProgressFill = document.getElementById('total-progress-fill');
-        if (totalProgressFill) {
-            totalProgressFill.style.width = `${state.totalProgress}%`;
+        if (elements.totalProgressBar) {
+            elements.totalProgressBar.style.width = `${state.totalProgress}%`;
         }
         
         // Update current file display
