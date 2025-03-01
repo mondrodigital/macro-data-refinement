@@ -309,9 +309,15 @@ document.addEventListener('DOMContentLoaded', () => {
             cols = 14;
         }
 
+        // Create a grid container to ensure proper layout
+        const gridContainer = document.createElement('div');
+        gridContainer.className = 'grid-container-inner';
+        elements.numberGrid.appendChild(gridContainer);
+
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
-                createNumberCell(i, j);
+                const cell = createNumberCell(i, j);
+                gridContainer.appendChild(cell);
             }
         }
 
@@ -328,46 +334,44 @@ document.addEventListener('DOMContentLoaded', () => {
         const cell = document.createElement('div');
         cell.className = 'number-cell';
         cell.textContent = number;
+        
+        // Set data attributes for position
         cell.dataset.row = row;
         cell.dataset.col = col;
-        cell.dataset.value = number;
         
-        // Add random wiggle animation properties
+        // Set random wiggle properties
         setWiggleProperties(cell);
-
-        if (state.isMobile) {
-            // Mobile: Use click/touch to select
-            cell.addEventListener('click', () => {
-                handleNumberSelection(cell);
-            });
-            
-            cell.addEventListener('touchstart', (e) => {
-                if (state.currentScreen === 'grid-screen') {
-                    e.preventDefault();
-                }
-                handleNumberSelection(cell);
-            }, { passive: false });
-        } else {
-            // Desktop: Use click to select and hover for magnifying effect
-            cell.addEventListener('click', () => {
-                handleNumberSelection(cell);
-            });
-            
-            // Add hover effect for magnifying glass
-            cell.addEventListener('mouseenter', () => {
-                handleNumberHover(cell);
-                playHoverSound();
-            });
-            
-            cell.addEventListener('mouseleave', () => {
-                if (!state.mouseDown) {
-                    handleNumberUnhover(cell);
-                }
-            });
-        }
-
-        elements.numberGrid.appendChild(cell);
-        return cell;
+        
+        // Add to the grid
+        // elements.numberGrid.appendChild(cell); // Remove this line as we now append in the generateNumberGrid function
+        
+        // Add event listeners for hover effect
+        cell.addEventListener('mouseenter', () => {
+            handleNumberHover(cell);
+        });
+        
+        cell.addEventListener('mouseleave', () => {
+            handleNumberUnhover(cell);
+        });
+        
+        // Add event listener for selection
+        cell.addEventListener('click', () => {
+            handleNumberSelection(cell);
+        });
+        
+        // Add touch event listeners for mobile
+        cell.addEventListener('touchstart', (e) => {
+            // Prevent default to avoid scrolling
+            e.preventDefault();
+            handleNumberHover(cell);
+        }, { passive: false });
+        
+        cell.addEventListener('touchend', () => {
+            handleNumberUnhover(cell);
+            handleNumberSelection(cell);
+        });
+        
+        return cell; // Return the cell element
     }
     
     function setWiggleProperties(cell) {
