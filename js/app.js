@@ -118,12 +118,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function ensureViewportMeta() {
         // Add viewport meta tag for mobile if not present
-        if (!document.querySelector('meta[name="viewport"]')) {
-            const meta = document.createElement('meta');
-            meta.name = 'viewport';
-            meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-            document.head.appendChild(meta);
+        let viewportMeta = document.querySelector('meta[name="viewport"]');
+        if (!viewportMeta) {
+            viewportMeta = document.createElement('meta');
+            viewportMeta.name = 'viewport';
+            document.head.appendChild(viewportMeta);
         }
+        
+        // Set the viewport content with proper scaling
+        viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
     }
 
     function addEventListeners() {
@@ -230,6 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Add keyboard event listener for number keys to select buckets
         document.addEventListener('keydown', handleKeyDown);
+        
+        // Add resize event listener to handle orientation changes
+        window.addEventListener('resize', handleResize);
     }
 
     function handleNameSubmit() {
@@ -265,8 +271,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Generate random numbers for the grid
         // Adjust grid size for mobile
-        const rows = state.isMobile ? 8 : 10;
-        const cols = state.isMobile ? (window.innerWidth < 480 ? 8 : 10) : 14;
+        let rows, cols;
+        
+        if (state.isMobile) {
+            // More responsive grid sizing based on screen width
+            if (window.innerWidth <= 320) {
+                rows = 7;
+                cols = 7;
+            } else if (window.innerWidth <= 375) {
+                rows = 7;
+                cols = 8;
+            } else if (window.innerWidth <= 480) {
+                rows = 8;
+                cols = 8;
+            } else {
+                rows = 8;
+                cols = 10;
+            }
+        } else {
+            // Desktop sizing
+            rows = 10;
+            cols = 14;
+        }
 
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
@@ -995,35 +1021,41 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(slideOutPlayer);
         
         // Create a floating music button for mobile
-        if (state.isMobile) {
-            const floatingMusicBtn = document.createElement('button');
-            floatingMusicBtn.className = 'floating-music-btn';
-            floatingMusicBtn.innerHTML = '<i class="fas fa-music"></i>';
-            document.body.appendChild(floatingMusicBtn);
-            
-            // Initially hide the slide-out player on mobile
-            slideOutPlayer.classList.add('hidden');
-            
-            // Toggle slide-out player visibility when floating button is clicked
-            floatingMusicBtn.addEventListener('click', toggleMusicPlayer);
-            floatingMusicBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
+        const floatingMusicBtn = document.createElement('button');
+        floatingMusicBtn.className = 'floating-music-btn';
+        floatingMusicBtn.innerHTML = '<i class="fas fa-music"></i>';
+        document.body.appendChild(floatingMusicBtn);
+        
+        // Initially hide the slide-out player
+        slideOutPlayer.classList.add('hidden');
+        
+        // Add a click handler to the player itself to collapse it
+        slideOutPlayer.addEventListener('click', (e) => {
+            // Only collapse if clicking on the player background, not its controls
+            if (e.target === slideOutPlayer || e.target.classList.contains('player-content')) {
                 toggleMusicPlayer();
-            }, { passive: false });
-            
-            // Function to toggle music player visibility
-            function toggleMusicPlayer() {
-                slideOutPlayer.classList.toggle('hidden');
-                floatingMusicBtn.classList.toggle('active');
-                
-                // Add animation class
-                slideOutPlayer.classList.add('animate');
-                
-                // Remove animation class after animation completes
-                setTimeout(() => {
-                    slideOutPlayer.classList.remove('animate');
-                }, 500);
             }
+        });
+        
+        // Toggle slide-out player visibility when floating button is clicked
+        floatingMusicBtn.addEventListener('click', toggleMusicPlayer);
+        floatingMusicBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            toggleMusicPlayer();
+        }, { passive: false });
+        
+        // Function to toggle music player visibility
+        function toggleMusicPlayer() {
+            slideOutPlayer.classList.toggle('hidden');
+            floatingMusicBtn.classList.toggle('active');
+            
+            // Add animation class
+            slideOutPlayer.classList.add('animate');
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                slideOutPlayer.classList.remove('animate');
+            }, 500);
         }
         
         // Add styles for the slide-out player
@@ -1044,6 +1076,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 backdrop-filter: blur(5px);
                 animation: pulse 8s infinite alternate;
                 transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+                cursor: pointer;
             }
             
             .slide-out-player.hidden {
@@ -1128,6 +1161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 align-items: center;
                 gap: 10px;
                 margin-bottom: 5px;
+                cursor: default;
             }
             
             .player-controls button {
@@ -1231,6 +1265,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 .slide-out-player h3 {
                     font-size: 16px;
                     margin-bottom: 10px;
+                }
+            }
+            
+            /* Additional mobile responsiveness */
+            @media (max-width: 480px) {
+                .slide-out-player {
+                    width: 200px;
+                    bottom: 85px;
+                }
+                
+                .player-controls {
+                    gap: 5px;
+                }
+                
+                .player-controls button {
+                    width: 40px;
+                    height: 40px;
+                    font-size: 16px;
+                }
+                
+                .floating-music-btn {
+                    width: 50px;
+                    height: 50px;
+                    font-size: 20px;
+                    bottom: 15px;
+                    right: 15px;
                 }
             }
         `;
@@ -2119,5 +2179,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
             }
         }, 800);
+    }
+
+    // Handle window resize events, particularly for orientation changes on mobile
+    function handleResize() {
+        // Only regenerate the grid if we're on the grid screen
+        if (state.currentScreen === 'grid-screen') {
+            // Small delay to ensure the resize is complete
+            setTimeout(() => {
+                generateNumberGrid();
+                
+                // Update UI elements that might need repositioning
+                updateUI();
+                
+                console.log('Window resized, grid regenerated');
+            }, 300);
+        }
     }
 }); 
