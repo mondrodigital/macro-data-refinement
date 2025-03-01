@@ -86,11 +86,36 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    margin-top: 20px;
+}
+
+.lumon-logo-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.lumon-logo-container .header-lumon-logo {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 20px;
+    animation: logo-pulse 4s infinite alternate;
+}
+
+@keyframes logo-pulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 5px #00c3ff); }
+    100% { transform: scale(1.05); filter: drop-shadow(0 0 15px #00c3ff); }
+}
+
+.subheader-text {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 40px;
+    color: rgba(0, 195, 255, 0.8);
 }
 
 .name-input {
-    background-color: transparent;
+    background-color: rgba(0, 24, 36, 0.5);
     border: 2px solid #00c3ff;
     color: #00c3ff;
     padding: 15px;
@@ -99,29 +124,104 @@ body {
     width: 80%;
     max-width: 400px;
     text-align: center;
+    transition: all 0.3s ease;
     box-shadow: 0 0 10px rgba(0, 195, 255, 0.3);
 }
 
 .name-input:focus {
     outline: none;
-    box-shadow: 0 0 15px #00c3ff;
+    box-shadow: 0 0 20px rgba(0, 195, 255, 0.6);
+    background-color: rgba(0, 24, 36, 0.8);
 }
 
 .submit-name-btn {
-    background-color: transparent;
-    color: #00c3ff;
+    background-color: rgba(0, 195, 255, 0.2);
     border: 2px solid #00c3ff;
+    color: #00c3ff;
     padding: 15px 30px;
     font-size: 1.2rem;
     cursor: pointer;
-    transition: all 0.8s ease;
-    text-shadow: 0 0 5px #00c3ff;
-    box-shadow: 0 0 10px rgba(0, 195, 255, 0.3);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .submit-name-btn:hover {
-    background-color: rgba(0, 195, 255, 0.2);
-    box-shadow: 0 0 15px #00c3ff;
+    background-color: rgba(0, 195, 255, 0.4);
+    box-shadow: 0 0 15px rgba(0, 195, 255, 0.8);
+}
+
+.submit-name-btn:active {
+    transform: scale(0.98);
+}
+
+/* Shake animation for invalid input */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Mobile adjustments for name screen */
+@media (max-width: 768px) {
+    .lumon-logo-container .header-lumon-logo {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 15px;
+    }
+    
+    .header-text {
+        font-size: 1.6rem;
+        margin: 15px 0 20px;
+    }
+    
+    .subheader-text {
+        font-size: 1rem;
+        margin-bottom: 30px;
+    }
+    
+    .name-input {
+        font-size: 1.2rem;
+        padding: 12px;
+        width: 90%;
+    }
+    
+    .submit-name-btn {
+        padding: 12px 24px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .lumon-logo-container .header-lumon-logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 10px;
+    }
+    
+    .header-text {
+        font-size: 1.4rem;
+        margin: 10px 0 15px;
+    }
+    
+    .subheader-text {
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+    
+    .name-input {
+        font-size: 1.1rem;
+        padding: 10px;
+    }
+    
+    .submit-name-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
 }
 
 /* Grid Container for Buttons */
@@ -153,80 +253,97 @@ body {
     transform: scale(1.05);
 }
 
-/* Number Grid Screen */
+/* Status Bar */
 .status-bar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 0;
-    border-bottom: 1px solid #00c3ff;
-    margin-bottom: 20px;
-    font-size: 1.2rem;
-    text-shadow: 0 0 5px #00c3ff;
-    flex-wrap: wrap;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 195, 255, 0.3);
 }
 
 .project-name {
-    font-size: 1.5rem;
-    margin-right: auto;
-    text-shadow: 0 0 8px #00c3ff;
-    letter-spacing: 1px;
+    font-size: 1.8rem;
+    color: #00c3ff;
+    text-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
+    flex: 1;
 }
 
 .progress-info {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 20px;
 }
 
 .progress-container {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 5px;
+    align-items: center;
+    gap: 15px;
 }
 
 .total-progress-bar {
-    width: 150px;
-    height: 8px;
+    width: 250px;
+    height: 20px;
     background-color: rgba(0, 195, 255, 0.1);
-    border-radius: 4px;
+    border: 1px solid #00c3ff;
+    border-radius: 2px;
     overflow: hidden;
-    position: relative;
-    border: 1px solid rgba(0, 195, 255, 0.3);
+    box-shadow: 0 0 10px rgba(0, 195, 255, 0.3), inset 0 0 5px rgba(0, 195, 255, 0.2);
 }
 
 .total-progress-fill {
-    position: absolute;
-    right: 0;
-    top: 0;
     height: 100%;
     background-color: #00c3ff;
-    box-shadow: 0 0 5px #00c3ff;
-    border-radius: 3px;
-    transition: width 0.8s ease-in-out;
+    box-shadow: 0 0 15px #00c3ff;
+    transition: width 0.5s ease;
+    position: relative;
+    margin-left: auto;
+    float: right;
+}
+
+.total-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        rgba(0, 195, 255, 0.5) 0%, 
+        rgba(0, 195, 255, 1) 50%, 
+        rgba(0, 195, 255, 0.5) 100%
+    );
+    animation: progressGlow 2s infinite;
+}
+
+@keyframes progressGlow {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+.progress-text {
+    font-size: 1.4rem;
+    color: #00c3ff;
+    text-shadow: 0 0 5px rgba(0, 195, 255, 0.5);
+    white-space: nowrap;
+    order: -1;
 }
 
 .company-name {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.2rem;
-    font-weight: bold;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px #00c3ff;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
 .header-lumon-logo {
-    width: 80px;
-    height: 30px;
-    background-image: url('../screenshots/lumen.png');
+    width: 55px;
+    height: 55px;
+    background-image: url('/screenshots/lumen.png');
     background-size: contain;
-    background-position: center;
     background-repeat: no-repeat;
-    filter: brightness(0) invert(1) sepia(100%) saturate(10000%) hue-rotate(170deg);
+    background-position: center;
+    filter: brightness(0) saturate(100%) invert(67%) sepia(72%) saturate(757%) hue-rotate(156deg) brightness(101%) contrast(101%);
 }
 
 .hex-codes-container {
@@ -370,16 +487,18 @@ body {
     display: flex;
     justify-content: space-between;
     margin-top: auto;
-    flex-wrap: wrap;
+    padding-bottom: 30px;
     gap: 10px;
+    flex-wrap: nowrap;
 }
 
 .bucket {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 18%;
-    min-width: 60px;
+    flex: 1;
+    min-width: 0;
+    max-width: 120px;
 }
 
 .bucket-label {
@@ -484,35 +603,37 @@ body {
     }
     
     .status-bar {
-        font-size: 0.9rem;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 3px;
-        margin-bottom: 5px;
+        flex-direction: row;
+        align-items: center;
         padding: 5px 0;
-    }
-    
-    .progress-info {
-        width: 100%;
-        justify-content: space-between;
-        margin-top: 3px;
+        margin-bottom: 10px;
     }
     
     .project-name {
+        font-size: 1.4rem;
+    }
+    
+    .progress-info {
+        gap: 10px;
+    }
+    
+    .total-progress-bar {
+        width: 150px;
+        height: 15px;
+    }
+    
+    .progress-text {
         font-size: 1.2rem;
     }
     
-    .company-name {
-        font-size: 1.2rem;
+    .header-lumon-logo {
+        width: 45px;
+        height: 45px;
     }
     
-    .number-grid {
-        height: 260px;
-        margin: 0;
-        padding: 5px 0;
-        flex: 0 0 auto;
-        position: relative;
-        z-index: 10;
+    .buckets {
+        padding-bottom: 50px;
+        gap: 8px;
     }
     
     .grid-container-inner {
@@ -567,9 +688,7 @@ body {
     }
     
     .bucket {
-        width: 18%;
-        margin-bottom: 0;
-        height: 65px;
+        max-width: none;
     }
     
     .buckets {
@@ -768,17 +887,6 @@ body {
     .bucket-drop-zone {
         height: 22px;
     }
-}
-
-/* Shake animation for input validation */
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-
-.shake {
-    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
 }
 
 /* Keyboard Shortcut Hint */

@@ -12,16 +12,20 @@
 <body>
     <div class="app-container">
         <!-- Screen 0: Name Input -->
-        <div id="name-screen" class="screen" style="display: none;">
-            <div class="header-text">Enter your name</div>
+        <div id="name-screen" class="screen">
+            <div class="lumon-logo-container">
+                <div class="header-lumon-logo"></div>
+            </div>
+            <div class="header-text">Welcome to Lumon Industries</div>
+            <div class="subheader-text">Please enter your name to begin</div>
             <div class="name-input-container">
-                <input type="text" id="user-name-input" class="name-input" placeholder="Your name" maxlength="15">
-                <button id="submit-name-btn" class="submit-name-btn">Begin</button>
+                <input type="text" id="user-name-input" class="name-input" placeholder="Your name" maxlength="20" autofocus>
+                <button id="submit-name-btn" class="submit-name-btn">Begin Refinement</button>
             </div>
         </div>
 
         <!-- Screen 1: Branch Selection -->
-        <div id="branch-screen" class="screen active">
+        <div id="branch-screen" class="screen">
             <div class="header-text">Select your branch country</div>
             <div class="grid-container">
                 <button class="grid-button" data-country="USA">USA</button>
@@ -154,6 +158,6 @@
     <!-- YouTube iframe API -->
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="js/app.js"></script>
-    <script src="/js/music-player.js"></script>
+    <script src="js/music-player.js"></script>
 </body>
 </html> 

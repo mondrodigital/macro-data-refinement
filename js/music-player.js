@@ -238,4 +238,7 @@
             addSlideOutMusicPlayer();
         }
     }, 3000);
+
+    // Expose the initialization function globally
+    window.initMusicPlayer = addSlideOutMusicPlayer;
 })(); 
