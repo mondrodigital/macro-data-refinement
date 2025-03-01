@@ -108,7 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
         initMusicPlayer();
         
         // Show the active screen
-        showScreen(state.currentScreen);
+        navigateToScreen(state.currentScreen);
+    }
+    
+    // Helper function to ensure proper screen navigation
+    function showScreen(screenId) {
+        navigateToScreen(screenId);
     }
     
     function detectMobile() {
@@ -1512,6 +1517,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create the completion overlay
         const overlay = document.createElement('div');
         overlay.className = 'severance-completion-overlay';
+        overlay.id = 'completion-screen'; // Add an ID for screen navigation
+        
+        // Hide all other screens first
+        Object.values(screens).forEach(screen => {
+            screen.classList.remove('active');
+        });
+        
+        // Add the overlay to the app container and make it active
+        document.querySelector('.app-container').appendChild(overlay);
+        
+        // Add the active class to make it visible
+        setTimeout(() => {
+            overlay.classList.add('active');
+        }, 10);
         
         // Add ceiling lights to match the image
         const ceilingLights = document.createElement('div');
