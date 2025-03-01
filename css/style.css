@@ -593,123 +593,89 @@ body {
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
-    .app-container {
-        height: 100%;
+    body {
         min-height: 100vh;
+        min-height: -webkit-fill-available;
+        overflow: hidden;
+    }
+
+    .app-container {
+        height: 100vh;
+        height: -webkit-fill-available;
         max-height: none;
         border-width: 1px;
-        padding: 10px 10px 80px;
-        overflow: hidden;
+        padding: 5px 5px 70px;
+        margin: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         display: flex;
         flex-direction: column;
-        position: relative;
-        justify-content: flex-start;
     }
 
     .status-bar {
-        padding: 5px 0;
-        margin-bottom: 5px;
-        transform: scale(0.9);
+        padding: 2px 0;
+        margin-bottom: 2px;
+        transform: scale(0.85);
         transform-origin: top center;
+        flex-shrink: 0;
     }
 
     .total-progress-bar {
-        height: 30px;
+        height: 25px;
     }
 
     .project-name, .progress-text {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 
     .header-lumon-logo {
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 30px;
+        margin-left: 10px;
     }
 
-    /* Ensure grid doesn't take too much space */
+    /* Ensure grid fits in viewport */
     .number-grid {
         height: auto;
-        min-height: 200px;
-        max-height: none;
-        aspect-ratio: 1.2/1;
-        margin: 5px 0;
-    }
-
-    .grid-container-inner {
-        grid-template-columns: repeat(8, 1fr);
-        gap: 4px;
-    }
-
-    .number-cell {
-        font-size: 0.9rem;
-        height: auto;
-        aspect-ratio: 1/1;
-        width: auto;
-    }
-
-    /* Position buckets at the bottom with proper spacing */
-    .buckets {
-        position: fixed;
-        bottom: 15px;
-        left: 15px;
-        right: 15px;
-        padding: 0 5px 15px;
-        margin: 0;
-        gap: 8px;
-        background-color: #001824;
-        z-index: 100;
-    }
-
-    .bucket {
-        max-width: none;
-        min-height: 60px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-    }
-
-    .bucket-drop-zone {
-        height: 40px;
-        font-size: 1rem;
-    }
-
-    /* Adjust spacing for iPhone browser bar */
-    @supports (-webkit-touch-callout: none) {
-        .app-container {
-            padding-bottom: 100px;
-            min-height: -webkit-fill-available;
-        }
-        
-        .buckets {
-            bottom: 25px;
-        }
-    }
-}
-
-@media (max-width: 480px) {
-    .app-container {
-        padding: 5px 5px 70px;
-    }
-
-    .status-bar {
-        transform: scale(0.85);
-    }
-
-    .number-grid {
-        aspect-ratio: 1/1;
+        flex: 1;
+        min-height: 0;
+        margin: 2px 0;
+        padding: 2px;
     }
 
     .grid-container-inner {
         grid-template-columns: repeat(8, 1fr);
         gap: 3px;
+        height: 100%;
     }
 
     .number-cell {
         font-size: 0.85rem;
+        height: auto;
+        aspect-ratio: 1/1;
+        width: auto;
+    }
+
+    /* Position buckets at the bottom */
+    .buckets {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 5px 5px 10px;
+        margin: 0;
+        gap: 5px;
+        background-color: #001824;
+        z-index: 100;
+        flex-shrink: 0;
     }
 
     .bucket {
-        min-height: 50px;
+        max-width: none;
+        min-height: 45px;
     }
 
     .bucket-drop-zone {
@@ -720,40 +686,36 @@ body {
     .bucket-progress {
         font-size: 0.7rem;
     }
+
+    /* Hide music player on mobile */
+    .music-player,
+    .floating-music-btn {
+        display: none !important;
+    }
+
+    /* Adjust grid border lines */
+    .grid-border-line {
+        margin: 2px 0;
+        flex-shrink: 0;
+    }
+
+    /* Hide hex codes on mobile */
+    .hex-codes-container {
+        display: none;
+    }
 }
 
-@media (max-height: 700px) {
+@media (max-width: 480px) {
+    .app-container {
+        padding: 2px 2px 60px;
+    }
+
     .status-bar {
         transform: scale(0.8);
-        margin-bottom: 2px;
     }
 
     .number-grid {
-        aspect-ratio: 1.4/1;
-    }
-
-    .bucket {
-        min-height: 45px;
-    }
-
-    .bucket-drop-zone {
-        height: 32px;
-    }
-}
-
-@media (max-height: 600px) {
-    .app-container {
-        padding: 2px 5px 60px;
-    }
-
-    .status-bar {
-        transform: scale(0.75);
-        margin-bottom: 0;
-    }
-
-    .number-grid {
-        aspect-ratio: 1.6/1;
-        margin: 2px 0;
+        margin: 1px 0;
     }
 
     .grid-container-inner {
@@ -765,8 +727,47 @@ body {
     }
 
     .bucket-drop-zone {
-        height: 28px;
+        height: 30px;
         font-size: 0.8rem;
+    }
+}
+
+@media (max-height: 600px) {
+    .app-container {
+        padding: 1px 2px 50px;
+    }
+
+    .status-bar {
+        transform: scale(0.75);
+        margin-bottom: 1px;
+    }
+
+    .number-grid {
+        margin: 1px 0;
+    }
+
+    .bucket {
+        min-height: 35px;
+    }
+
+    .bucket-drop-zone {
+        height: 25px;
+        font-size: 0.75rem;
+    }
+
+    .bucket-progress {
+        font-size: 0.65rem;
+    }
+}
+
+/* Ensure iOS Safari handles height correctly */
+@supports (-webkit-touch-callout: none) {
+    body {
+        height: -webkit-fill-available;
+    }
+
+    .app-container {
+        height: -webkit-fill-available;
     }
 }
 
