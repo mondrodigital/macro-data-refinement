@@ -1619,28 +1619,16 @@ document.addEventListener('DOMContentLoaded', () => {
             .waffle {
                 width: 100%;
                 height: 100%;
-                background-color: #e6c07b;
-                border-radius: 10px;
+                background-image: url('../screenshots/waffle.png');
+                background-size: contain;
+                background-position: center;
+                background-repeat: no-repeat;
                 position: relative;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
                 transform-style: preserve-3d;
             }
             
             .waffle:before, .waffle:after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(45deg, transparent 25%, rgba(101, 67, 33, 0.2) 25%, rgba(101, 67, 33, 0.2) 50%, transparent 50%, transparent 75%, rgba(101, 67, 33, 0.2) 75%);
-                background-size: 20px 20px;
-                border-radius: 10px;
-            }
-            
-            .waffle:after {
-                background: linear-gradient(-45deg, transparent 25%, rgba(101, 67, 33, 0.2) 25%, rgba(101, 67, 33, 0.2) 50%, transparent 50%, transparent 75%, rgba(101, 67, 33, 0.2) 75%);
-                background-size: 20px 20px;
+                display: none;
             }
             
             @keyframes waffle-dance {
