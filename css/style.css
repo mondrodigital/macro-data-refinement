@@ -259,8 +259,9 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px 0;
-    margin-bottom: 15px;
-    position: relative;
+    margin-bottom: 10px;
+    width: 100%;
+    flex-shrink: 0;
 }
 
 .progress-info {
@@ -351,12 +352,12 @@ body {
 
 /* Grid Section */
 .grid-section {
+    flex: 1;
     display: flex;
     flex-direction: column;
     width: 100%;
-    flex: 0 0 auto;
-    position: relative;
-    z-index: 5;
+    min-height: 0; /* Important for flexbox to allow shrinking below content size */
+    overflow: hidden; /* Prevent any overflow */
 }
 
 .grid-section .top-line,
@@ -369,13 +370,15 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 10px 0;
-    height: 350px;
+    margin: 0;
+    flex: 1;
+    min-height: 0; /* Allow shrinking */
+    width: 100%;
     position: relative;
     touch-action: manipulation;
     padding: 5px;
     z-index: 10;
-    flex: 0 0 auto; /* Prevent flex stretching */
+    overflow: hidden;
 }
 
 .grid-container-inner {
@@ -475,10 +478,13 @@ body {
 .buckets {
     display: flex;
     justify-content: space-between;
-    margin-top: auto;
-    padding-bottom: 30px;
+    align-items: center;
+    margin: 10px 0;
+    padding: 10px 0;
     gap: 10px;
-    flex-wrap: nowrap;
+    width: 100%;
+    z-index: 20;
+    flex-shrink: 0;
 }
 
 .bucket {
@@ -645,15 +651,12 @@ body {
     /* Make grid fill entire screen */
     .number-grid {
         height: auto;
-        flex: 1 1 auto;
-        display: flex;
+        flex: 1;
         min-height: 0;
-        margin: 0;
-        padding: 0;
+        margin: 1px 0;
+        padding: 1px;
         overflow: hidden;
         width: 100%;
-        align-items: stretch;
-        justify-content: stretch;
     }
 
     .grid-container-inner {
@@ -661,16 +664,13 @@ body {
         gap: 5px;
         height: 100%;
         width: 100%;
-        min-height: 0;
-        flex: 1;
-        align-self: stretch;
     }
 
     .number-cell {
         font-size: 1rem;
-        height: 100%;
+        height: auto;
         aspect-ratio: 1/1;
-        width: 100%;
+        width: auto;
     }
 
     /* Position buckets at the bottom */
@@ -745,20 +745,17 @@ body {
     
     /* Improve grid layout - modify grid to fill space */
     .grid-section {
-        flex: 1 1 auto;
+        flex: 1;
         display: flex;
         flex-direction: column;
         margin: 0;
         padding: 0;
         width: 100%;
-        min-height: 0;
-        height: auto;
     }
     
     .number-grid .grid-container-inner {
         height: 100%;
         max-height: none;
-        display: grid;
     }
     
     /* Fix countries and filename screens */
@@ -766,9 +763,6 @@ body {
         width: 100%;
         max-width: 100%;
         overflow-x: hidden;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
     }
     
     .grid-container {
@@ -784,27 +778,6 @@ body {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
-    }
-    
-    /* Fix screen content to fill entire viewport */
-    #grid-screen.active {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-    
-    .screen.active > * {
-        flex-shrink: 0;
-    }
-    
-    .screen.active .grid-section {
-        flex: 1 1 auto;
-        min-height: 0;
-    }
-    
-    /* Remove any fixed heights that could limit expansion */
-    .number-grid {
-        height: auto;
     }
 }
 
@@ -1142,4 +1115,16 @@ body {
         overflow: auto;
         -webkit-overflow-scrolling: touch;
     }
+}
+
+/* Make sure grid screen uses full height */
+#grid-screen {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+#grid-screen.active {
+    display: flex;
 } 
