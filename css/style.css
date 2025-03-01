@@ -260,36 +260,26 @@ body {
     align-items: center;
     padding: 10px 0;
     margin-bottom: 15px;
-    border-bottom: 1px solid rgba(0, 195, 255, 0.3);
-}
-
-.project-name {
-    font-size: 1.8rem;
-    color: #00c3ff;
-    text-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
-    flex: 1;
+    position: relative;
 }
 
 .progress-info {
     display: flex;
     align-items: center;
-    gap: 20px;
-}
-
-.progress-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    flex: 1;
+    margin-right: 20px;
+    position: relative;
 }
 
 .total-progress-bar {
-    width: 250px;
-    height: 20px;
+    width: 100%;
+    height: 40px;
     background-color: rgba(0, 195, 255, 0.1);
-    border: 1px solid #00c3ff;
-    border-radius: 2px;
+    border: 2px solid #00c3ff;
+    border-radius: 4px;
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0, 195, 255, 0.3), inset 0 0 5px rgba(0, 195, 255, 0.2);
+    position: relative;
 }
 
 .total-progress-fill {
@@ -297,53 +287,52 @@ body {
     background-color: #00c3ff;
     box-shadow: 0 0 15px #00c3ff;
     transition: width 0.5s ease;
-    position: relative;
-    margin-left: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
     float: right;
 }
 
-.total-progress-fill::after {
-    content: '';
+.project-name {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, 
-        rgba(0, 195, 255, 0.5) 0%, 
-        rgba(0, 195, 255, 1) 50%, 
-        rgba(0, 195, 255, 0.5) 100%
-    );
-    animation: progressGlow 2s infinite;
-}
-
-@keyframes progressGlow {
-    0% { opacity: 0.7; }
-    50% { opacity: 1; }
-    100% { opacity: 0.7; }
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.4rem;
+    color: #001824;
+    z-index: 2;
+    text-shadow: 
+        -0.5px -0.5px 0 #00c3ff,
+        0.5px -0.5px 0 #00c3ff,
+        -0.5px 0.5px 0 #00c3ff,
+        0.5px 0.5px 0 #00c3ff;
 }
 
 .progress-text {
+    position: absolute;
+    right: 50%;
+    top: 50%;
+    transform: translate(50%, -50%);
     font-size: 1.4rem;
-    color: #00c3ff;
-    text-shadow: 0 0 5px rgba(0, 195, 255, 0.5);
+    color: #001824;
     white-space: nowrap;
-    order: -1;
-}
-
-.company-name {
-    display: flex;
-    align-items: center;
+    z-index: 2;
+    text-shadow: 
+        -0.5px -0.5px 0 #00c3ff,
+        0.5px -0.5px 0 #00c3ff,
+        -0.5px 0.5px 0 #00c3ff,
+        0.5px 0.5px 0 #00c3ff;
 }
 
 .header-lumon-logo {
-    width: 55px;
-    height: 55px;
+    width: 60px;
+    height: 60px;
     background-image: url('/screenshots/lumen.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     filter: brightness(0) saturate(100%) invert(67%) sepia(72%) saturate(757%) hue-rotate(156deg) brightness(101%) contrast(101%);
+    margin-left: 20px;
 }
 
 .hex-codes-container {
@@ -499,46 +488,56 @@ body {
     flex: 1;
     min-width: 0;
     max-width: 120px;
+    gap: 8px;
 }
 
 .bucket-label {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-    text-shadow: 0 0 5px #00c3ff;
-}
-
-.bucket-progress-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 5px;
-    min-height: 20px;
-}
-
-.bucket-progress {
-    font-size: 0.9rem;
-    text-align: center;
+    display: none;
 }
 
 .bucket-drop-zone {
     width: 100%;
-    height: 40px;
+    height: 60px;
     border: 1px solid #00c3ff;
-    box-shadow: 0 0 5px #00c3ff;
+    background-color: transparent;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: all 0.3s ease;
-    touch-action: none;
+    font-size: 1.2rem;
+    color: #00c3ff;
+}
+
+.bucket-progress-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.bucket-progress-bar {
+    width: 100%;
+    height: 1px;
+    background-color: rgba(0, 195, 255, 0.1);
     position: relative;
-    overflow: hidden;
+}
+
+.bucket-progress-fill {
+    height: 100%;
+    background-color: #00c3ff;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: width 0.3s ease;
+}
+
+.bucket-progress {
+    font-size: 0.9rem;
+    color: #00c3ff;
 }
 
 .bucket-drop-zone.highlight {
-    background-color: rgba(0, 195, 255, 0.2);
-    box-shadow: 0 0 15px #00c3ff, inset 0 0 10px #00c3ff;
-    transform: scale(1.1);
-    transition-duration: 0.3s;
+    background-color: rgba(0, 195, 255, 0.1);
 }
 
 /* Dragging */
@@ -550,16 +549,33 @@ body {
 
 /* Number Animation */
 .number-animation {
-    position: absolute;
-    color: #fff;
-    font-size: 1.2rem;
-    text-shadow: 0 0 10px #fff, 0 0 20px #00c3ff;
-    z-index: 30;
-    pointer-events: none;
-    background-color: transparent;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    position: fixed !important;
+    color: #00c3ff !important;
+    font-size: 1.2rem !important;
+    text-shadow: 0 0 10px #00c3ff !important;
+    z-index: 1000 !important;
+    pointer-events: none !important;
+    background-color: transparent !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    will-change: transform, opacity !important;
+    animation: number-float 0.5s ease-out !important;
+}
+
+@keyframes number-float {
+    0% {
+        transform: scale(1);
+        text-shadow: 0 0 5px #00c3ff;
+    }
+    50% {
+        transform: scale(1.5);
+        text-shadow: 0 0 15px #00c3ff;
+    }
+    100% {
+        transform: scale(1.2);
+        text-shadow: 0 0 10px #00c3ff;
+    }
 }
 
 /* Horizontal lines above and below grid */
@@ -581,12 +597,65 @@ body {
         height: 100vh;
         max-height: none;
         border-width: 1px;
-        padding: 10px 10px 15px;
+        padding: 10px 10px 80px; /* Increased bottom padding */
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        position: relative; /* Added for absolute positioning of buckets */
     }
-    
+
+    /* Ensure grid doesn't take too much space */
+    .number-grid {
+        height: calc(100vh - 250px); /* Adjust height to leave space for buckets */
+        min-height: 200px;
+        max-height: 350px;
+    }
+
+    /* Position buckets at the bottom with proper spacing */
+    .buckets {
+        position: absolute;
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        padding: 0 5px 15px;
+        margin: 0;
+        gap: 8px;
+        background-color: #001824; /* Match app background */
+        z-index: 100;
+    }
+
+    .bucket {
+        max-width: none;
+        min-height: 75px; /* Ensure minimum height */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .bucket-drop-zone {
+        height: 50px;
+        font-size: 1.1rem;
+    }
+
+    .bucket-progress {
+        font-size: 0.8rem;
+    }
+
+    .bucket-progress-bar {
+        height: 3px;
+    }
+
+    /* Adjust spacing for iPhone browser bar */
+    @supports (-webkit-touch-callout: none) {
+        .app-container {
+            padding-bottom: 100px; /* Extra padding for iOS */
+        }
+        
+        .buckets {
+            bottom: 25px; /* Move up slightly on iOS */
+        }
+    }
+
     .header-text {
         font-size: 1.5rem;
         margin: 5px 0 10px;
@@ -610,7 +679,7 @@ body {
     }
     
     .project-name {
-        font-size: 1.4rem;
+        font-size: 1.2rem;
     }
     
     .progress-info {
@@ -618,8 +687,7 @@ body {
     }
     
     .total-progress-bar {
-        width: 150px;
-        height: 15px;
+        height: 35px;
     }
     
     .progress-text {
@@ -627,13 +695,8 @@ body {
     }
     
     .header-lumon-logo {
-        width: 45px;
-        height: 45px;
-    }
-    
-    .buckets {
-        padding-bottom: 50px;
-        gap: 8px;
+        width: 50px;
+        height: 50px;
     }
     
     .grid-container-inner {
@@ -687,25 +750,6 @@ body {
         width: 28px;
     }
     
-    .bucket {
-        max-width: none;
-    }
-    
-    .buckets {
-        justify-content: space-between;
-        padding: 0 5px;
-        margin-top: auto;
-        flex: 0 0 auto;
-    }
-    
-    .bucket-progress-container {
-        min-height: 16px;
-    }
-    
-    .bucket-progress {
-        font-size: 0.8rem;
-    }
-    
     .screen {
         display: none;
         height: 100%;
@@ -737,24 +781,35 @@ body {
     #grid-screen.active {
         display: flex;
     }
-    
-    /* Adjust bucket drop zone height */
-    .bucket-drop-zone {
-        height: 35px;
-    }
-    
-    /* Make sure the buckets are at the bottom */
-    .buckets {
-        margin-top: auto;
-        padding-top: 10px;
-    }
 }
 
 @media (max-width: 480px) {
     .app-container {
-        padding: 5px 5px 10px;
+        padding-bottom: 90px;
     }
-    
+
+    .number-grid {
+        height: calc(100vh - 220px);
+        min-height: 180px;
+    }
+
+    .bucket {
+        min-height: 65px;
+    }
+
+    .bucket-drop-zone {
+        height: 45px;
+        font-size: 1rem;
+    }
+
+    .bucket-progress {
+        font-size: 0.7rem;
+    }
+
+    .bucket-progress-bar {
+        height: 2px;
+    }
+
     .header-text {
         font-size: 1.3rem;
         margin: 5px 0 8px;
@@ -767,10 +822,6 @@ body {
     .bucket {
         width: 18%;
         height: 55px;
-    }
-    
-    .number-grid {
-        height: 220px;
     }
     
     .grid-container-inner {
@@ -811,26 +862,45 @@ body {
         font-size: 0.8rem;
     }
     
-    .bucket-progress {
-        font-size: 0.7rem;
-    }
-    
     .hex-codes {
         font-size: 0.7rem;
     }
-    
-    /* Adjust bucket drop zone height */
-    .bucket-drop-zone {
+
+    .total-progress-bar {
         height: 30px;
+    }
+
+    .project-name {
+        font-size: 1rem;
+        left: 10px;
+    }
+
+    .progress-text {
+        font-size: 1rem;
+    }
+
+    .header-lumon-logo {
+        width: 40px;
+        height: 40px;
+        margin-left: 10px;
     }
 }
 
-/* Small phones */
-@media (max-width: 375px) {
-    .number-grid {
-        height: 200px;
+/* Smaller screens */
+@media (max-width: 360px) {
+    .app-container {
+        padding-bottom: 100px;
     }
-    
+
+    .number-grid {
+        height: calc(100vh - 200px);
+        min-height: 160px;
+    }
+
+    .bucket {
+        min-height: 60px;
+    }
+
     .grid-container-inner {
         grid-template-columns: repeat(7, 1fr);
         gap: 3px;
@@ -854,38 +924,6 @@ body {
     .header-text {
         font-size: 1.2rem;
         margin: 3px 0 6px;
-    }
-    
-    /* Adjust bucket drop zone height */
-    .bucket-drop-zone {
-        height: 25px;
-    }
-}
-
-/* Extra small phones */
-@media (max-width: 320px) {
-    .number-grid {
-        height: 180px;
-    }
-    
-    .grid-container-inner {
-        grid-template-columns: repeat(7, 1fr);
-        gap: 3px;
-    }
-    
-    .number-cell {
-        height: 20px;
-        width: 20px;
-        font-size: 0.8rem;
-    }
-    
-    .bucket {
-        height: 45px;
-    }
-    
-    /* Adjust bucket drop zone height */
-    .bucket-drop-zone {
-        height: 22px;
     }
 }
 

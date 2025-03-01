@@ -773,67 +773,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function animateNumbersToBucket(numbers, bucketId) {
-        // Get the bucket element
-        const bucketElement = document.getElementById(`bucket-${bucketId}`);
-        if (!bucketElement) return;
-        
-        // Create a copy of the numbers array to avoid modifying the original during animation
-        const numbersCopy = [...numbers];
-        
-        // Get positions for animation
-        const bucketRect = bucketElement.getBoundingClientRect();
+        const bucket = document.getElementById(`bucket-${bucketId}`);
+        if (!bucket) return;
+
+        // Get bucket position
+        const bucketRect = bucket.getBoundingClientRect();
         const bucketCenterX = bucketRect.left + bucketRect.width / 2;
         const bucketCenterY = bucketRect.top + bucketRect.height / 2;
-        
-        // Highlight the bucket briefly
-        bucketElement.classList.add('highlight');
-        setTimeout(() => {
-            bucketElement.classList.remove('highlight');
-        }, 300);
-        
-        // Track how many animations have completed
-        let completedAnimations = 0;
-        
-        // Animate each number to fall off the page
-        numbersCopy.forEach((num, index) => {
-            // Create an animated number element
-            const animatedNumber = document.createElement('div');
-            animatedNumber.className = 'number-animation';
-            animatedNumber.textContent = num.value;
+
+        // Create animation elements for each number
+        numbers.forEach((number, index) => {
+            // Use the element directly from the number object
+            const cell = number.element;
+            if (!cell) return;
+
+            const cellRect = cell.getBoundingClientRect();
+            const clone = cell.cloneNode(true);
             
-            // Position it at the original number's position
-            const rect = num.element.getBoundingClientRect();
-            animatedNumber.style.left = `${rect.left}px`;
-            animatedNumber.style.top = `${rect.top}px`;
+            // Style the clone
+            clone.style.position = 'fixed';
+            clone.style.left = `${cellRect.left}px`;
+            clone.style.top = `${cellRect.top}px`;
+            clone.style.width = `${cellRect.width}px`;
+            clone.style.height = `${cellRect.height}px`;
+            clone.style.zIndex = '1000';
+            clone.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            clone.style.transform = 'scale(1.2)';
+            clone.classList.add('number-animation');
+            clone.style.color = '#00c3ff';
+            clone.style.opacity = '1';
             
-            // Add it to the body
-            document.body.appendChild(animatedNumber);
-            
-            // Make the original number invisible
-            num.element.style.opacity = '0';
-            
-            // Animate it falling off the page
+            document.body.appendChild(clone);
+
+            // Animate to a point above the bucket first
+            requestAnimationFrame(() => {
+                const aboveY = bucketRect.top - 30;
+                clone.style.left = `${bucketCenterX - cellRect.width / 2}px`;
+                clone.style.top = `${aboveY}px`;
+                clone.style.transform = 'scale(1.5)';
+            });
+
+            // Then animate into the bucket
             setTimeout(() => {
-                animatedNumber.style.transition = 'all 0.5s ease-in-out';
-                animatedNumber.style.top = `${window.innerHeight + 100}px`; // Fall below the screen
-                animatedNumber.style.opacity = '0';
-                
-                // Remove the animated number after animation
-                setTimeout(() => {
-                    animatedNumber.remove();
-                    completedAnimations++;
-                    
-                    // If this is the last number, process the drop
-                    if (completedAnimations === numbersCopy.length) {
-                        processDrop(bucketId);
-                    }
-                }, 500);
-            }, index * 100);
-            
-            // Remove the selection from the original number
-            num.element.classList.remove('selected');
-            num.element.classList.remove('hover-effect');
+                clone.style.left = `${bucketCenterX - cellRect.width / 2}px`;
+                clone.style.top = `${bucketCenterY - cellRect.height / 2}px`;
+                clone.style.transform = 'scale(0.8)';
+                clone.style.opacity = '0';
+            }, 300 + index * 50);
+
+            // Remove the clone after animation
+            setTimeout(() => {
+                if (clone.parentNode) {
+                    document.body.removeChild(clone);
+                }
+            }, 800 + index * 50);
+
+            // Hide the original cell immediately
+            cell.style.opacity = '0';
+            setTimeout(() => {
+                if (cell.parentNode) {
+                    cell.parentNode.removeChild(cell);
+                }
+            }, 800 + index * 50);
         });
+
+        // Process the drop after all animations
+        setTimeout(() => {
+            processDrop(bucketId);
+            playSuccessSound();
+            flashScreen();
+        }, 800 + numbers.length * 50);
     }
     
     function processDrop(bucketId) {
