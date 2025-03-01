@@ -349,9 +349,17 @@ body {
     text-shadow: 0 0 5px #00c3ff;
 }
 
+.bucket-progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 5px;
+    min-height: 20px;
+}
+
 .bucket-progress {
     font-size: 0.9rem;
-    margin-bottom: 5px;
+    text-align: center;
 }
 
 .bucket-drop-zone {
@@ -458,49 +466,29 @@ body {
     
     .number-grid {
         height: 300px;
-        gap: 4px;
-        grid-template-columns: repeat(10, 1fr);
+        gap: 6px;
+        grid-template-columns: repeat(14, 1fr);
     }
     
     .number-cell {
-        font-size: 1.2rem;
-        padding: 5px;
+        font-size: 1rem;
     }
     
     .bucket {
-        width: 18%;
+        width: 30%;
         margin-bottom: 10px;
     }
     
     .buckets {
-        justify-content: space-between;
-        padding: 10px 5px;
-        margin-top: 15px;
+        justify-content: center;
     }
     
-    .bucket-drop-zone {
-        height: 50px;
-        transition: all 0.3s ease;
+    .bucket-progress-container {
+        min-height: 16px;
     }
     
-    .bucket-drop-zone.highlight, 
-    .bucket-drop-zone.active {
-        background-color: rgba(0, 195, 255, 0.3);
-        box-shadow: 0 0 15px #00c3ff, inset 0 0 10px #00c3ff;
-        transform: scale(1.1);
-    }
-    
-    .number-cell.selected {
-        transform: scale(1.5);
-    }
-    
-    @keyframes selectedPulse {
-        0% {
-            transform: scale(1.3);
-        }
-        100% {
-            transform: scale(1.5);
-        }
+    .bucket-progress {
+        font-size: 0.8rem;
     }
 }
 
@@ -510,53 +498,43 @@ body {
     }
     
     .bucket {
-        width: 18%;
-    }
-    
-    .bucket-label {
-        font-size: 1rem;
-    }
-    
-    .bucket-progress {
-        font-size: 0.8rem;
-    }
-    
-    .number-grid {
-        gap: 3px;
-        grid-template-columns: repeat(8, 1fr);
-        height: 280px;
-    }
-    
-    .number-cell {
-        font-size: 1.1rem;
+        width: 45%;
     }
     
     .number-cell.hover-effect {
-        transform: scale(1.8);
-        transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        transform: scale(2.2);
+        transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     
     .number-cell.ripple-effect-1 {
-        transform: scale(var(--dynamic-scale, 1.4));
-        transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        transform: scale(var(--dynamic-scale, 1.6));
+        transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     
     .number-cell.ripple-effect-2 {
-        transform: scale(var(--dynamic-scale, 1.2));
-        transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        transform: scale(var(--dynamic-scale, 1.3));
+        transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
     
     .number-cell.selected {
-        transform: scale(1.4);
+        transform: scale(1.7);
     }
     
     @keyframes selectedPulse {
         0% {
-            transform: scale(1.2);
+            transform: scale(1.5);
         }
         100% {
-            transform: scale(1.4);
+            transform: scale(1.7);
         }
+    }
+    
+    .bucket-progress-container {
+        min-height: 14px;
+    }
+    
+    .bucket-progress {
+        font-size: 0.7rem;
     }
 }
 

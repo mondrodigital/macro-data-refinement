@@ -899,6 +899,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gridScreen) {
             gridScreen.appendChild(hint);
             
+            // Position the hint better on mobile
+            if (state.isMobile) {
+                // Position it above the buckets
+                const bucketsElement = document.querySelector('.buckets');
+                if (bucketsElement) {
+                    const bucketsRect = bucketsElement.getBoundingClientRect();
+                    const gridRect = gridScreen.getBoundingClientRect();
+                    const topPosition = bucketsRect.top - gridRect.top - 60;
+                    hint.style.bottom = 'auto';
+                    hint.style.top = `${topPosition}px`;
+                }
+            }
+            
             // Animate in
             setTimeout(() => {
                 hint.classList.add('visible');
