@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mouseDown: false,
         hoverCells: [],
         hasShownKeyboardHint: false,
+        completionScreenShown: false,
         audioPlayer: {
             isPlaying: false,
             isMuted: false,
@@ -1420,9 +1421,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add the showSeveranceCompletion function
     function showSeveranceCompletion() {
+        // Check if completion screen is already shown to prevent duplicates
+        if (state.completionScreenShown) {
+            console.log('Completion screen already shown, preventing duplicate');
+            return;
+        }
+        
+        // Set flag to indicate completion screen is now shown
+        state.completionScreenShown = true;
+        
         // Create the completion overlay
         const overlay = document.createElement('div');
         overlay.className = 'severance-completion-overlay';
+        
+        // Add ceiling lights to match the image
+        const ceilingLights = document.createElement('div');
+        ceilingLights.className = 'ceiling-lights';
+        
+        // Create light panels
+        for (let i = 0; i < 16; i++) {
+            const lightPanel = document.createElement('div');
+            lightPanel.className = 'light-panel';
+            ceilingLights.appendChild(lightPanel);
+        }
+        
+        overlay.appendChild(ceilingLights);
         
         // Create the content container
         const container = document.createElement('div');
@@ -1474,7 +1497,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 justify-content: center;
                 align-items: center;
                 animation: fadeIn 1s ease-in-out;
+                overflow: hidden;
             }
+            
+            /* Add ceiling lights to match the image */
+            .severance-completion-overlay:before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 120px;
+                background: #000;
+                z-index: -1;
+            }
+            
+            /* Ceiling light panels */
+            .ceiling-lights {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 120px;
+                display: grid;
+                grid-template-columns: repeat(8, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .light-panel {
+                background-color: #333;
+                border-radius: 4px;
+                transition: background-color 0.5s ease;
+            }
+            
+            .light-panel.blue { background-color: rgba(0, 123, 255, 0.8); box-shadow: 0 0 15px rgba(0, 123, 255, 0.8); }
+            .light-panel.pink { background-color: rgba(255, 105, 180, 0.8); box-shadow: 0 0 15px rgba(255, 105, 180, 0.8); }
+            .light-panel.orange { background-color: rgba(255, 165, 0, 0.8); box-shadow: 0 0 15px rgba(255, 165, 0, 0.8); }
+            .light-panel.yellow { background-color: rgba(255, 255, 0, 0.8); box-shadow: 0 0 15px rgba(255, 255, 0, 0.8); }
+            .light-panel.white { background-color: rgba(255, 255, 255, 0.8); box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); }
             
             .severance-completion-container {
                 width: 90%;
@@ -1498,32 +1560,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 width: 80px;
                 height: 80px;
                 border-radius: 50%;
-                background-color: #fff;
+                background-color: transparent;
                 margin: 0 auto 20px;
                 position: relative;
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                background-image: url('../screenshots/lumen.png');
+                background-size: contain;
+                background-position: center;
+                background-repeat: no-repeat;
             }
             
             .logo-inner {
-                width: 60%;
-                height: 60%;
-                border-radius: 50%;
-                background-color: #00c3ff;
-                position: relative;
-            }
-            
-            .logo-inner:before {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 70%;
-                height: 70%;
-                transform: translate(-50%, -50%);
-                border-radius: 50%;
-                background-color: #fff;
+                display: none; /* Hide the CSS-based logo since we're using the image */
             }
             
             .completion-header h1 {
@@ -1679,9 +1729,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (restartBtn) {
             restartBtn.addEventListener('click', () => {
                 // Stop the congratulatory sound if it's playing
-                if (completionSound && !completionSound.paused) {
-                    completionSound.pause();
-                    completionSound.currentTime = 0;
+                if (window.currentCompletionSound && !window.currentCompletionSound.paused) {
+                    window.currentCompletionSound.pause();
+                    window.currentCompletionSound.currentTime = 0;
                 }
                 
                 // Reset the game state
@@ -1690,6 +1740,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     state.buckets[i].progress = 0;
                     state.buckets[i].numbers = [];
                 }
+                
+                // Reset the completion screen flag
+                state.completionScreenShown = false;
                 
                 // Remove the completion screen
                 document.body.removeChild(overlay);
@@ -1709,9 +1762,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elevatorBtn) {
             elevatorBtn.addEventListener('click', () => {
                 // Stop the congratulatory sound if it's playing
-                if (completionSound && !completionSound.paused) {
-                    completionSound.pause();
-                    completionSound.currentTime = 0;
+                if (window.currentCompletionSound && !window.currentCompletionSound.paused) {
+                    window.currentCompletionSound.pause();
+                    window.currentCompletionSound.currentTime = 0;
                 }
                 
                 // Create elevator transition effect
@@ -1750,6 +1803,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         width: 80%;
                     }
                     
+                    .elevator-logo {
+                        width: 100px;
+                        height: 100px;
+                        margin-bottom: 20px;
+                        filter: brightness(0) invert(1) sepia(100%) saturate(10000%) hue-rotate(170deg);
+                    }
+                    
                     .elevator-message.visible {
                         opacity: 1;
                     }
@@ -1763,7 +1823,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Add the elevator message
                     const message = document.createElement('div');
                     message.className = 'elevator-message';
-                    message.innerHTML = 'You are now leaving Lumon Industries.<br>Your outie will wake up momentarily.';
+                    message.innerHTML = `
+                        <img src="screenshots/lumen.png" alt="Lumon Logo" class="elevator-logo">
+                        <p>You are now leaving Lumon Industries.<br>Your outie will wake up momentarily.</p>
+                    `;
                     elevator.appendChild(message);
                     
                     // Show the message
@@ -1778,6 +1841,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 state.buckets[i].progress = 0;
                                 state.buckets[i].numbers = [];
                             }
+                            
+                            // Reset the completion screen flag
+                            state.completionScreenShown = false;
                             
                             // Navigate to the branch screen
                             navigateToScreen('branch-screen');
@@ -1877,10 +1943,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const backgroundMusicWasPlaying = pauseBackgroundMusic();
         console.log('Background music was playing:', backgroundMusicWasPlaying);
         
+        // Start the ceiling light animation
+        animateCeilingLights();
+        
         // Create and play the congratulatory sound
         const completionSound = new Audio();
         completionSound.volume = 0.5;
         completionSound.src = 'audio/congrats.mp3'; // Make sure this file exists in your audio folder
+        
+        // Store the audio element in a global variable to ensure we can access it later
+        window.currentCompletionSound = completionSound;
+        
+        // Stop any previously playing completion sounds
+        if (window.previousCompletionSound && !window.previousCompletionSound.paused) {
+            console.log('Stopping previously playing completion sound');
+            window.previousCompletionSound.pause();
+            window.previousCompletionSound.currentTime = 0;
+        }
+        
+        // Store this as the previous sound for next time
+        window.previousCompletionSound = completionSound;
         
         // Sync waffle dance with audio beat
         const syncWaffleDance = () => {
@@ -1954,9 +2036,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clean up when the overlay is removed
         const cleanupFunction = () => {
             // Stop the sound if it's still playing
-            if (completionSound && !completionSound.paused) {
-                completionSound.pause();
-                completionSound.currentTime = 0;
+            if (window.currentCompletionSound && !window.currentCompletionSound.paused) {
+                window.currentCompletionSound.pause();
+                window.currentCompletionSound.currentTime = 0;
             }
             
             // Clear the timeout and intervals
@@ -1969,5 +2051,78 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Add event listener for when the overlay is removed
         overlay.addEventListener('remove', cleanupFunction);
+    }
+    
+    // Function to animate ceiling lights
+    function animateCeilingLights() {
+        const lightPanels = document.querySelectorAll('.light-panel');
+        if (!lightPanels.length) return;
+        
+        const colors = ['blue', 'pink', 'orange', 'yellow', 'white'];
+        
+        // Initial random colors
+        lightPanels.forEach(panel => {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            panel.classList.add(randomColor);
+        });
+        
+        // Animate lights with different patterns
+        setInterval(() => {
+            // Random pattern selection
+            const pattern = Math.floor(Math.random() * 4);
+            
+            switch(pattern) {
+                case 0: // All panels change randomly
+                    lightPanels.forEach(panel => {
+                        // Remove all color classes
+                        colors.forEach(color => panel.classList.remove(color));
+                        
+                        // Add a random color
+                        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                        panel.classList.add(randomColor);
+                    });
+                    break;
+                    
+                case 1: // Alternating rows
+                    lightPanels.forEach((panel, index) => {
+                        // Remove all color classes
+                        colors.forEach(color => panel.classList.remove(color));
+                        
+                        // Add color based on row
+                        const row = Math.floor(index / 8);
+                        const colorIndex = (row + Math.floor(Date.now() / 500)) % colors.length;
+                        panel.classList.add(colors[colorIndex]);
+                    });
+                    break;
+                    
+                case 2: // Alternating columns
+                    lightPanels.forEach((panel, index) => {
+                        // Remove all color classes
+                        colors.forEach(color => panel.classList.remove(color));
+                        
+                        // Add color based on column
+                        const col = index % 8;
+                        const colorIndex = (col + Math.floor(Date.now() / 500)) % colors.length;
+                        panel.classList.add(colors[colorIndex]);
+                    });
+                    break;
+                    
+                case 3: // Checkerboard pattern
+                    lightPanels.forEach((panel, index) => {
+                        // Remove all color classes
+                        colors.forEach(color => panel.classList.remove(color));
+                        
+                        // Create checkerboard pattern
+                        const row = Math.floor(index / 8);
+                        const col = index % 8;
+                        const isEven = (row + col) % 2 === 0;
+                        const timeOffset = Math.floor(Date.now() / 800) % 2;
+                        const colorIndex = ((isEven ? 0 : 1) + timeOffset) % colors.length;
+                        
+                        panel.classList.add(colors[colorIndex]);
+                    });
+                    break;
+            }
+        }, 800);
     }
 }); 
