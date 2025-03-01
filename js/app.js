@@ -722,12 +722,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressIncrease = Math.floor(Math.random() * 5) + 1;
         state.buckets[bucketId].progress += progressIncrease;
         
-        // Update total progress (ensure it's a more noticeable increase)
-        state.totalProgress += progressIncrease;
+        // MODIFIED: Make each bin completion jump the progress bar by 33% for testing
+        state.totalProgress += 33;
         
         // Ensure total progress doesn't exceed 100%
         if (state.totalProgress > 100) {
             state.totalProgress = 100;
+        }
+        
+        // Add completion screen trigger when progress reaches 100%
+        if (state.totalProgress >= 100) {
+            // Show completion screen after a short delay
+            setTimeout(() => {
+                showSeveranceCompletion();
+            }, 1500);
         }
         
         // Mark that we've shown the keyboard hint
@@ -1408,5 +1416,442 @@ document.addEventListener('DOMContentLoaded', () => {
         navigateToScreen('grid-screen');
         generateNumberGrid();
         playSelectSound();
+    }
+
+    // Add the showSeveranceCompletion function
+    function showSeveranceCompletion() {
+        // Create the completion overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'severance-completion-overlay';
+        
+        // Create the content container
+        const container = document.createElement('div');
+        container.className = 'severance-completion-container';
+        
+        // Add Lumon-style content
+        container.innerHTML = `
+            <div class="completion-header">
+                <div class="lumon-logo">
+                    <div class="logo-inner"></div>
+                </div>
+                <h1>REFINEMENT COMPLETE</h1>
+            </div>
+            <div class="completion-message">
+                <p>Congratulations, <span class="employee-name">${state.userName}</span>.</p>
+                <p>Your work in Macrodata Refinement has been exemplary.</p>
+                <p>The Board is pleased with your performance.</p>
+                <p class="quote">"The data has been refined to 100% completion."</p>
+                <div class="waffle-party-notice">
+                    <h2>YOU ARE ELIGIBLE FOR A WAFFLE PARTY</h2>
+                    <p>Please proceed to the break room to receive your reward.</p>
+                </div>
+            </div>
+            <div class="completion-actions">
+                <button class="severance-btn" id="restart-btn">Begin New File</button>
+                <button class="severance-btn" id="elevator-btn">Return to Outie</button>
+            </div>
+        `;
+        
+        // Add to the overlay and then to the body
+        overlay.appendChild(container);
+        document.body.appendChild(overlay);
+        
+        // Add CSS for the completion screen
+        const style = document.createElement('style');
+        style.textContent = `
+            .severance-completion-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                animation: fadeIn 1s ease-in-out;
+            }
+            
+            .severance-completion-container {
+                width: 90%;
+                max-width: 600px;
+                background-color: #001824;
+                border: 3px solid #00c3ff;
+                box-shadow: 0 0 30px #00c3ff;
+                padding: 30px;
+                color: #00c3ff;
+                text-align: center;
+                position: relative;
+                animation: scaleIn 0.5s ease-out 0.5s both;
+            }
+            
+            .completion-header {
+                margin-bottom: 30px;
+                position: relative;
+            }
+            
+            .lumon-logo {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background-color: #fff;
+                margin: 0 auto 20px;
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .logo-inner {
+                width: 60%;
+                height: 60%;
+                border-radius: 50%;
+                background-color: #00c3ff;
+                position: relative;
+            }
+            
+            .logo-inner:before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 70%;
+                height: 70%;
+                transform: translate(-50%, -50%);
+                border-radius: 50%;
+                background-color: #fff;
+            }
+            
+            .completion-header h1 {
+                font-family: 'Courier New', monospace;
+                font-size: 28px;
+                letter-spacing: 2px;
+                margin: 0;
+                text-shadow: 0 0 10px #00c3ff;
+            }
+            
+            .completion-message {
+                margin-bottom: 30px;
+                font-size: 18px;
+                line-height: 1.6;
+            }
+            
+            .employee-name {
+                font-weight: bold;
+                color: #fff;
+                text-shadow: 0 0 5px #00c3ff;
+            }
+            
+            .quote {
+                font-style: italic;
+                margin: 20px 0;
+                padding: 10px;
+                border-left: 3px solid #00c3ff;
+                text-align: left;
+            }
+            
+            .waffle-party-notice {
+                margin: 30px 0;
+                padding: 15px;
+                border: 1px dashed #00c3ff;
+                background-color: rgba(0, 195, 255, 0.1);
+                animation: pulse 2s infinite alternate;
+            }
+            
+            .waffle-party-notice h2 {
+                color: #fff;
+                margin: 0 0 10px 0;
+                font-size: 20px;
+                letter-spacing: 1px;
+            }
+            
+            .completion-actions {
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                margin-top: 30px;
+            }
+            
+            .severance-btn {
+                background-color: rgba(0, 195, 255, 0.2);
+                border: 2px solid #00c3ff;
+                color: #00c3ff;
+                padding: 12px 24px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-family: 'Courier New', monospace;
+            }
+            
+            .severance-btn:hover {
+                background-color: rgba(0, 195, 255, 0.4);
+                box-shadow: 0 0 15px #00c3ff;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes scaleIn {
+                from { transform: scale(0.8); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            
+            @keyframes pulse {
+                0% { box-shadow: 0 0 5px #00c3ff inset; }
+                100% { box-shadow: 0 0 15px #00c3ff inset; }
+            }
+            
+            /* Mobile adjustments */
+            @media (max-width: 768px) {
+                .severance-completion-container {
+                    padding: 20px;
+                }
+                
+                .completion-header h1 {
+                    font-size: 22px;
+                }
+                
+                .completion-message {
+                    font-size: 16px;
+                }
+                
+                .waffle-party-notice h2 {
+                    font-size: 18px;
+                }
+                
+                .completion-actions {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+                
+                .severance-btn {
+                    width: 100%;
+                }
+            }
+        `;
+        
+        document.head.appendChild(style);
+        
+        // Add event listeners for the buttons
+        const restartBtn = document.getElementById('restart-btn');
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                // Stop the congratulatory sound if it's playing
+                if (completionSound && !completionSound.paused) {
+                    completionSound.pause();
+                    completionSound.currentTime = 0;
+                }
+                
+                // Reset the game state
+                state.totalProgress = 0;
+                for (let i = 1; i <= 5; i++) {
+                    state.buckets[i].progress = 0;
+                    state.buckets[i].numbers = [];
+                }
+                
+                // Remove the completion screen
+                document.body.removeChild(overlay);
+                
+                // Navigate back to file selection
+                navigateToScreen('file-screen');
+                
+                // Update UI
+                updateUI();
+                
+                // Play select sound
+                playSelectSound();
+            });
+        }
+        
+        const elevatorBtn = document.getElementById('elevator-btn');
+        if (elevatorBtn) {
+            elevatorBtn.addEventListener('click', () => {
+                // Stop the congratulatory sound if it's playing
+                if (completionSound && !completionSound.paused) {
+                    completionSound.pause();
+                    completionSound.currentTime = 0;
+                }
+                
+                // Create elevator transition effect
+                const elevator = document.createElement('div');
+                elevator.className = 'elevator-transition';
+                document.body.appendChild(elevator);
+                
+                // Add elevator transition styles
+                const elevatorStyle = document.createElement('style');
+                elevatorStyle.textContent = `
+                    .elevator-transition {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 0;
+                        background-color: #000;
+                        z-index: 10001;
+                        transition: height 3s ease-in-out;
+                    }
+                    
+                    .elevator-transition.active {
+                        height: 100%;
+                    }
+                    
+                    .elevator-message {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        color: #00c3ff;
+                        font-size: 24px;
+                        opacity: 0;
+                        transition: opacity 1s ease-in-out;
+                        text-align: center;
+                        width: 80%;
+                    }
+                    
+                    .elevator-message.visible {
+                        opacity: 1;
+                    }
+                `;
+                document.head.appendChild(elevatorStyle);
+                
+                // Animate the elevator closing
+                setTimeout(() => {
+                    elevator.classList.add('active');
+                    
+                    // Add the elevator message
+                    const message = document.createElement('div');
+                    message.className = 'elevator-message';
+                    message.innerHTML = 'You are now leaving Lumon Industries.<br>Your outie will wake up momentarily.';
+                    elevator.appendChild(message);
+                    
+                    // Show the message
+                    setTimeout(() => {
+                        message.classList.add('visible');
+                        
+                        // After a delay, redirect to the start screen
+                        setTimeout(() => {
+                            // Reset the game state
+                            state.totalProgress = 0;
+                            for (let i = 1; i <= 5; i++) {
+                                state.buckets[i].progress = 0;
+                                state.buckets[i].numbers = [];
+                            }
+                            
+                            // Navigate to the branch screen
+                            navigateToScreen('branch-screen');
+                            
+                            // Remove the completion and elevator overlays
+                            document.body.removeChild(overlay);
+                            document.body.removeChild(elevator);
+                            
+                            // Update UI
+                            updateUI();
+                        }, 4000);
+                    }, 1500);
+                }, 100);
+                
+                // Play select sound
+                playSelectSound();
+            });
+        }
+        
+        // Find and pause the background music player if it's playing
+        const pauseBackgroundMusic = () => {
+            // Try to find the audio element
+            const backgroundAudio = document.querySelector('audio#background-music');
+            if (backgroundAudio && !backgroundAudio.paused) {
+                // Store the current state to potentially resume later
+                const wasPlaying = !backgroundAudio.paused;
+                backgroundAudio.pause();
+                
+                // Update the play/pause button if it exists
+                const playPauseBtn = document.querySelector('.play-pause-btn');
+                if (playPauseBtn) {
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+                
+                console.log('Background music paused');
+                return wasPlaying;
+            }
+            return false;
+        };
+        
+        // Pause any currently playing background music
+        const backgroundMusicWasPlaying = pauseBackgroundMusic();
+        
+        // Create and play the congratulatory sound
+        const completionSound = new Audio();
+        completionSound.volume = 0.5;
+        completionSound.src = 'audio/congrats.mp3'; // Make sure this file exists in your audio folder
+        
+        // Set up a timer to stop the sound after 2 minutes (120 seconds)
+        const soundTimeout = setTimeout(() => {
+            if (completionSound && !completionSound.paused) {
+                completionSound.pause();
+                completionSound.currentTime = 0;
+                console.log('Congratulatory sound stopped after 2 minutes');
+            }
+        }, 120000); // 2 minutes in milliseconds
+        
+        // Add event listener for when the sound ends naturally
+        completionSound.addEventListener('ended', () => {
+            clearTimeout(soundTimeout); // Clear the timeout since it ended naturally
+            console.log('Congratulatory sound ended naturally');
+        });
+        
+        // Try to play the sound (may fail on mobile without user interaction)
+        try {
+            const playPromise = completionSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('Congratulatory sound started playing');
+                }).catch(err => {
+                    console.log('Could not play congratulatory sound automatically:', err);
+                    
+                    // If we couldn't play the sound, add a button to play it
+                    const soundButton = document.createElement('button');
+                    soundButton.className = 'severance-btn sound-btn';
+                    soundButton.innerHTML = '<i class="fas fa-volume-up"></i> Play Celebration';
+                    soundButton.style.marginTop = '15px';
+                    
+                    // Add the button to the container
+                    const actionsDiv = container.querySelector('.completion-actions');
+                    if (actionsDiv) {
+                        actionsDiv.appendChild(soundButton);
+                        
+                        // Add event listener to play sound when clicked
+                        soundButton.addEventListener('click', () => {
+                            completionSound.play().catch(e => console.error('Still could not play sound:', e));
+                            soundButton.disabled = true;
+                            soundButton.innerHTML = '<i class="fas fa-volume-up"></i> Playing...';
+                        });
+                    }
+                });
+            }
+        } catch (e) {
+            console.log('Error playing congratulatory sound:', e);
+        }
+        
+        // Clean up when the overlay is removed
+        const cleanupFunction = () => {
+            // Stop the sound if it's still playing
+            if (completionSound && !completionSound.paused) {
+                completionSound.pause();
+                completionSound.currentTime = 0;
+            }
+            
+            // Clear the timeout
+            clearTimeout(soundTimeout);
+            
+            // Remove the event listener
+            overlay.removeEventListener('remove', cleanupFunction);
+        };
+        
+        // Add event listener for when the overlay is removed
+        overlay.addEventListener('remove', cleanupFunction);
     }
 }); 
