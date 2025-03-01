@@ -723,8 +723,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressIncrease = Math.floor(Math.random() * 5) + 1;
         state.buckets[bucketId].progress += progressIncrease;
         
-        // MODIFIED: Make each bin completion jump the progress bar by 33% for testing
-        state.totalProgress += 33;
+        // MODIFIED: Make each bin completion increase the progress bar by 20% (takes 5 submissions to reach 100%)
+        state.totalProgress += 20;
         
         // Ensure total progress doesn't exceed 100%
         if (state.totalProgress > 100) {
