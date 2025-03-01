@@ -1825,6 +1825,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 margin: 20px auto 10px;
                 position: relative;
                 animation: waffle-dance 3s infinite ease-in-out;
+                transform-origin: center center;
             }
             
             .waffle {
@@ -1836,6 +1837,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 background-repeat: no-repeat;
                 position: relative;
                 transform-style: preserve-3d;
+                filter: drop-shadow(0 0 5px rgba(255, 165, 0, 0.7));
             }
             
             .waffle:before, .waffle:after {
@@ -1843,9 +1845,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             @keyframes waffle-dance {
-                0% { transform: rotate(-10deg); }
-                50% { transform: rotate(10deg); }
-                100% { transform: rotate(-10deg); }
+                0% { transform: rotate(-10deg) translateY(0); }
+                25% { transform: rotate(-5deg) translateY(-5px); }
+                50% { transform: rotate(10deg) translateY(0); }
+                75% { transform: rotate(5deg) translateY(-5px); }
+                100% { transform: rotate(-10deg) translateY(0); }
+            }
+            
+            /* Add a subtle glow to the waffle on hover */
+            .dancing-waffle:hover .waffle {
+                filter: drop-shadow(0 0 10px rgba(255, 165, 0, 0.9));
+                animation: waffle-hover 1.5s infinite ease-in-out;
+            }
+            
+            @keyframes waffle-hover {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(1); }
             }
             
             /* Mobile adjustments */
@@ -1855,6 +1871,67 @@ document.addEventListener('DOMContentLoaded', () => {
                     width: 95%;
                     max-height: 90vh;
                     overflow-y: auto;
+                    border-width: 2px;
+                }
+                
+                .completion-header h1 {
+                    font-size: 22px;
+                    letter-spacing: 1px;
+                }
+                
+                .completion-message {
+                    font-size: 16px;
+                    margin-bottom: 15px;
+                    line-height: 1.4;
+                }
+                
+                .waffle-party-notice h2 {
+                    font-size: 18px;
+                    letter-spacing: 0.5px;
+                }
+                
+                .completion-actions {
+                    flex-direction: column;
+                    gap: 10px;
+                    width: 100%;
+                    max-width: 300px;
+                    margin: 20px auto 0;
+                }
+                
+                .severance-btn {
+                    width: 100%;
+                    padding: 12px 10px;
+                    font-size: 16px;
+                }
+                
+                .dancing-waffle {
+                    width: 80px;
+                    height: 80px;
+                    margin: 15px auto 10px;
+                }
+                
+                .lumon-logo {
+                    width: 60px;
+                    height: 60px;
+                    margin: 0 auto 15px;
+                }
+                
+                .ceiling-lights {
+                    height: 60px;
+                }
+                
+                .quote {
+                    margin: 15px 0;
+                    padding: 8px 12px;
+                    font-size: 15px;
+                }
+            }
+            
+            /* Medium phones */
+            @media (max-width: 480px) {
+                .severance-completion-container {
+                    padding: 12px;
+                    box-shadow: 0 0 20px #00c3ff;
                 }
                 
                 .completion-header h1 {
@@ -1863,38 +1940,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 .completion-message {
                     font-size: 14px;
-                    margin-bottom: 15px;
+                    line-height: 1.4;
+                }
+                
+                .waffle-party-notice {
+                    margin: 20px 0;
+                    padding: 12px;
                 }
                 
                 .waffle-party-notice h2 {
                     font-size: 16px;
                 }
                 
-                .completion-actions {
-                    flex-direction: column;
-                    gap: 10px;
-                }
-                
-                .severance-btn {
-                    width: 100%;
-                    padding: 10px;
-                    font-size: 14px;
-                }
-                
                 .dancing-waffle {
                     width: 70px;
                     height: 70px;
-                    margin: 10px auto 5px;
                 }
                 
                 .lumon-logo {
-                    width: 60px;
-                    height: 60px;
-                    margin: 0 auto 10px;
+                    width: 55px;
+                    height: 55px;
+                    margin: 0 auto 12px;
                 }
                 
                 .ceiling-lights {
-                    height: 60px;
+                    height: 50px;
                 }
             }
             
@@ -1902,15 +1972,18 @@ document.addEventListener('DOMContentLoaded', () => {
             @media (max-width: 375px) {
                 .severance-completion-container {
                     padding: 10px;
+                    border-width: 2px;
                 }
                 
                 .completion-header h1 {
                     font-size: 18px;
+                    letter-spacing: 0.5px;
                 }
                 
                 .completion-message {
                     font-size: 13px;
-                    line-height: 1.4;
+                    line-height: 1.3;
+                    margin-bottom: 10px;
                 }
                 
                 .waffle-party-notice {
@@ -1920,25 +1993,149 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 .waffle-party-notice h2 {
                     font-size: 14px;
+                    letter-spacing: 0.5px;
                 }
                 
                 .dancing-waffle {
                     width: 60px;
                     height: 60px;
+                    margin: 8px auto 5px;
                 }
                 
                 .lumon-logo {
                     width: 50px;
                     height: 50px;
+                    margin: 0 auto 8px;
                 }
                 
                 .ceiling-lights {
                     height: 40px;
+                    gap: 5px;
+                    padding: 5px;
                 }
                 
                 .quote {
                     margin: 10px 0;
                     padding: 5px 10px;
+                    font-size: 12px;
+                }
+                
+                .severance-btn {
+                    padding: 10px;
+                    font-size: 14px;
+                }
+            }
+            
+            /* Extra small phones */
+            @media (max-width: 320px) {
+                .severance-completion-container {
+                    padding: 8px;
+                }
+                
+                .completion-header h1 {
+                    font-size: 16px;
+                    letter-spacing: 0;
+                }
+                
+                .completion-message {
+                    font-size: 12px;
+                    line-height: 1.2;
+                }
+                
+                .waffle-party-notice h2 {
+                    font-size: 13px;
+                    margin-bottom: 5px;
+                }
+                
+                .dancing-waffle {
+                    width: 50px;
+                    height: 50px;
+                    margin: 5px auto;
+                }
+                
+                .lumon-logo {
+                    width: 40px;
+                    height: 40px;
+                    margin: 0 auto 5px;
+                }
+                
+                .ceiling-lights {
+                    height: 30px;
+                }
+                
+                .severance-btn {
+                    padding: 8px;
+                    font-size: 13px;
+                }
+            }
+            
+            /* Landscape orientation adjustments */
+            @media (max-height: 500px) and (orientation: landscape) {
+                .severance-completion-container {
+                    max-height: 85vh;
+                    padding: 10px 15px;
+                    display: flex;
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                }
+                
+                .completion-header {
+                    width: 100%;
+                    margin-bottom: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                
+                .lumon-logo {
+                    width: 40px;
+                    height: 40px;
+                    margin: 0 10px 0 0;
+                }
+                
+                .completion-header h1 {
+                    font-size: 18px;
+                    margin: 0;
+                }
+                
+                .completion-message {
+                    width: 60%;
+                    font-size: 13px;
+                    line-height: 1.3;
+                    margin-bottom: 0;
+                    text-align: left;
+                }
+                
+                .completion-actions {
+                    width: 35%;
+                    margin: 0;
+                    flex-direction: column;
+                }
+                
+                .waffle-party-notice {
+                    margin: 10px 0;
+                    padding: 8px;
+                }
+                
+                .waffle-party-notice h2 {
+                    font-size: 14px;
+                }
+                
+                .dancing-waffle {
+                    width: 50px;
+                    height: 50px;
+                    margin: 5px auto;
+                }
+                
+                .quote {
+                    margin: 8px 0;
+                    padding: 5px 8px;
+                }
+                
+                .ceiling-lights {
+                    height: 30px;
                 }
             }
         `;
@@ -2022,6 +2219,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         transition: opacity 1s ease-in-out;
                         text-align: center;
                         width: 80%;
+                        max-width: 500px;
+                        padding: 20px;
+                        border-radius: 5px;
+                        background-color: rgba(0, 24, 36, 0.3);
+                        border: 1px solid rgba(0, 195, 255, 0.3);
+                        box-shadow: 0 0 20px rgba(0, 195, 255, 0.2);
+                        backdrop-filter: blur(3px);
                     }
                     
                     .elevator-logo {
@@ -2029,10 +2233,76 @@ document.addEventListener('DOMContentLoaded', () => {
                         height: 100px;
                         margin-bottom: 20px;
                         filter: brightness(0) invert(1) sepia(100%) saturate(10000%) hue-rotate(170deg);
+                        animation: pulse-glow 2s infinite alternate;
+                    }
+                    
+                    @keyframes pulse-glow {
+                        0% { filter: brightness(0) invert(1) sepia(100%) saturate(10000%) hue-rotate(170deg) drop-shadow(0 0 5px rgba(0, 195, 255, 0.5)); }
+                        100% { filter: brightness(0) invert(1) sepia(100%) saturate(10000%) hue-rotate(170deg) drop-shadow(0 0 15px rgba(0, 195, 255, 0.8)); }
                     }
                     
                     .elevator-message.visible {
                         opacity: 1;
+                    }
+                    
+                    .elevator-message p {
+                        line-height: 1.5;
+                        margin: 0;
+                    }
+                    
+                    /* Mobile adjustments for elevator */
+                    @media (max-width: 768px) {
+                        .elevator-message {
+                            font-size: 20px;
+                            width: 90%;
+                            padding: 15px;
+                        }
+                        
+                        .elevator-logo {
+                            width: 80px;
+                            height: 80px;
+                            margin-bottom: 15px;
+                        }
+                    }
+                    
+                    @media (max-width: 480px) {
+                        .elevator-message {
+                            font-size: 18px;
+                            padding: 12px;
+                        }
+                        
+                        .elevator-logo {
+                            width: 70px;
+                            height: 70px;
+                            margin-bottom: 12px;
+                        }
+                    }
+                    
+                    @media (max-width: 375px) {
+                        .elevator-message {
+                            font-size: 16px;
+                            padding: 10px;
+                            width: 95%;
+                        }
+                        
+                        .elevator-logo {
+                            width: 60px;
+                            height: 60px;
+                            margin-bottom: 10px;
+                        }
+                    }
+                    
+                    @media (max-width: 320px) {
+                        .elevator-message {
+                            font-size: 14px;
+                            padding: 8px;
+                        }
+                        
+                        .elevator-logo {
+                            width: 50px;
+                            height: 50px;
+                            margin-bottom: 8px;
+                        }
                     }
                 `;
                 document.head.appendChild(elevatorStyle);
@@ -2044,10 +2314,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Add the elevator message
                     const message = document.createElement('div');
                     message.className = 'elevator-message';
-                    message.innerHTML = `
-                        <img src="screenshots/lumen.png" alt="Lumon Logo" class="elevator-logo">
-                        <p>You are now leaving Lumon Industries.<br>Your outie will wake up momentarily.</p>
-                    `;
+                    
+                    // Check if mobile to adjust content
+                    if (state.isMobile) {
+                        message.innerHTML = `
+                            <img src="screenshots/lumen.png" alt="Lumon Logo" class="elevator-logo">
+                            <p>You are now leaving Lumon Industries.<br>Your outie will wake up momentarily.</p>
+                        `;
+                    } else {
+                        message.innerHTML = `
+                            <img src="screenshots/lumen.png" alt="Lumon Logo" class="elevator-logo">
+                            <p>You are now leaving Lumon Industries.<br>Your outie will wake up momentarily.</p>
+                        `;
+                    }
+                    
                     elevator.appendChild(message);
                     
                     // Show the message
