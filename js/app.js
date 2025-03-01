@@ -985,6 +985,38 @@ document.addEventListener('DOMContentLoaded', () => {
         
         document.body.appendChild(slideOutPlayer);
         
+        // Create a floating music button for mobile
+        if (state.isMobile) {
+            const floatingMusicBtn = document.createElement('button');
+            floatingMusicBtn.className = 'floating-music-btn';
+            floatingMusicBtn.innerHTML = '<i class="fas fa-music"></i>';
+            document.body.appendChild(floatingMusicBtn);
+            
+            // Initially hide the slide-out player on mobile
+            slideOutPlayer.classList.add('hidden');
+            
+            // Toggle slide-out player visibility when floating button is clicked
+            floatingMusicBtn.addEventListener('click', toggleMusicPlayer);
+            floatingMusicBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                toggleMusicPlayer();
+            }, { passive: false });
+            
+            // Function to toggle music player visibility
+            function toggleMusicPlayer() {
+                slideOutPlayer.classList.toggle('hidden');
+                floatingMusicBtn.classList.toggle('active');
+                
+                // Add animation class
+                slideOutPlayer.classList.add('animate');
+                
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    slideOutPlayer.classList.remove('animate');
+                }, 500);
+            }
+        }
+        
         // Add styles for the slide-out player
         const style = document.createElement('style');
         style.textContent = `
@@ -1002,6 +1034,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 flex-direction: column;
                 backdrop-filter: blur(5px);
                 animation: pulse 8s infinite alternate;
+                transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            }
+            
+            .slide-out-player.hidden {
+                transform: translateX(110%);
+                opacity: 0;
+            }
+            
+            .slide-out-player.animate {
+                animation: slideInPlayer 0.5s ease-in-out;
+            }
+            
+            @keyframes slideInPlayer {
+                0% {
+                    transform: translateX(110%);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            .floating-music-btn {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background-color: rgba(0, 24, 36, 0.7);
+                border: 2px solid #00c3ff;
+                color: #00c3ff;
+                font-size: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9998;
+                cursor: pointer;
+                box-shadow: 0 0 10px #00c3ff;
+                transition: all 0.3s ease;
+                -webkit-tap-highlight-color: transparent;
+            }
+            
+            .floating-music-btn:active,
+            .floating-music-btn.active {
+                background-color: rgba(0, 195, 255, 0.3);
+                transform: scale(0.95);
             }
             
             @keyframes pulse {
@@ -1111,11 +1191,26 @@ document.addEventListener('DOMContentLoaded', () => {
             
             @media (max-width: 768px) {
                 .slide-out-player {
-                    bottom: 20px;
+                    bottom: 90px;
                     top: auto;
                     right: 20px;
                     transform: none;
                     width: 220px;
+                }
+                
+                .slide-out-player.hidden {
+                    transform: translateY(110%);
+                }
+                
+                @keyframes slideInPlayer {
+                    0% {
+                        transform: translateY(110%);
+                        opacity: 0;
+                    }
+                    100% {
+                        transform: translateY(0);
+                        opacity: 1;
+                    }
                 }
                 
                 .player-controls button {
