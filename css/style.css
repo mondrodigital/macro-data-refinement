@@ -508,7 +508,8 @@ body {
     
     .number-grid {
         height: 260px;
-        margin-bottom: 5px;
+        margin: 0;
+        padding: 5px 0;
         flex: 0 0 auto;
         position: relative;
         z-index: 10;
@@ -526,6 +527,7 @@ body {
         width: 100%;
         flex: 0 0 auto;
         margin-bottom: 10px;
+        position: relative;
     }
     
     /* Fix grid border lines on mobile */
@@ -536,6 +538,16 @@ body {
         height: 1px; /* Ensure it's just 1px tall */
         width: 100%;
         clear: both; /* Ensure it doesn't float with other elements */
+        position: relative;
+        z-index: 15; /* Higher z-index to ensure it's above the grid */
+    }
+    
+    .grid-border-line.top-line {
+        margin-bottom: 0;
+    }
+    
+    .grid-border-line.bottom-line {
+        margin-top: 0;
     }
     
     /* Ensure the hex codes container is below the grid */

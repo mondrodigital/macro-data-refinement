@@ -309,23 +309,66 @@ document.addEventListener('DOMContentLoaded', () => {
             cols = 14;
         }
 
-        // Create a grid container to ensure proper layout
-        const gridContainer = document.createElement('div');
-        gridContainer.className = 'grid-container-inner';
-        
-        // Create all cells and add them to the container
-        for (let i = 0; i < rows; i++) {
-            for (let j = 0; j < cols; j++) {
-                const cell = createNumberCell(i, j);
-                gridContainer.appendChild(cell);
+        // For mobile, we'll handle the grid section differently
+        if (state.isMobile) {
+            // Get the grid section element
+            const gridSection = document.querySelector('.grid-section');
+            
+            // Clear everything
+            gridSection.innerHTML = '';
+            
+            // Create top border line
+            const topLine = document.createElement('div');
+            topLine.className = 'grid-border-line top-line';
+            gridSection.appendChild(topLine);
+            
+            // Create grid container
+            const gridContainer = document.createElement('div');
+            gridContainer.className = 'grid-container-inner';
+            
+            // Create all cells and add them to the container
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const cell = createNumberCell(i, j);
+                    gridContainer.appendChild(cell);
+                }
             }
+            
+            // Create a wrapper for the grid
+            const gridWrapper = document.createElement('div');
+            gridWrapper.className = 'number-grid';
+            gridWrapper.id = 'number-grid';
+            
+            // Add the grid container to the wrapper
+            gridWrapper.appendChild(gridContainer);
+            
+            // Add the wrapper to the grid section
+            gridSection.appendChild(gridWrapper);
+            
+            // Create bottom border line
+            const bottomLine = document.createElement('div');
+            bottomLine.className = 'grid-border-line bottom-line';
+            gridSection.appendChild(bottomLine);
+            
+            // Update the elements reference
+            elements.numberGrid = document.getElementById('number-grid');
+        } else {
+            // Desktop behavior - use the existing structure
+            const gridContainer = document.createElement('div');
+            gridContainer.className = 'grid-container-inner';
+            
+            // Create all cells and add them to the container
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    const cell = createNumberCell(i, j);
+                    gridContainer.appendChild(cell);
+                }
+            }
+            
+            // Clear the number grid and add the new elements
+            elements.numberGrid.innerHTML = '';
+            elements.numberGrid.appendChild(gridContainer);
         }
-        
-        // Clear the number grid and add the new elements in the correct order
-        elements.numberGrid.innerHTML = '';
-        
-        // Add the grid container to the number grid
-        elements.numberGrid.appendChild(gridContainer);
 
         // Clear selected numbers
         state.selectedNumbers = [];
