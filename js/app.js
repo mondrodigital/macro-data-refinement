@@ -312,14 +312,20 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create a grid container to ensure proper layout
         const gridContainer = document.createElement('div');
         gridContainer.className = 'grid-container-inner';
-        elements.numberGrid.appendChild(gridContainer);
-
+        
+        // Create all cells and add them to the container
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
                 const cell = createNumberCell(i, j);
                 gridContainer.appendChild(cell);
             }
         }
+        
+        // Clear the number grid and add the new elements in the correct order
+        elements.numberGrid.innerHTML = '';
+        
+        // Add the grid container to the number grid
+        elements.numberGrid.appendChild(gridContainer);
 
         // Clear selected numbers
         state.selectedNumbers = [];

@@ -58,13 +58,13 @@
         <!-- Screen 3: Number Grid -->
         <div id="grid-screen" class="screen">
             <div class="status-bar">
-                <div class="project-name" id="current-file">Quirk</div>
+                <div class="project-name" id="display-user-name">Refinement Worker</div>
                 <div class="progress-info">
                     <div class="progress-container">
-                        <div id="total-progress">3% Complete</div>
                         <div class="total-progress-bar">
-                            <div class="total-progress-fill" id="total-progress-fill" style="width: 3%;"></div>
+                            <div id="total-progress" class="total-progress-fill" style="width: 3%;"></div>
                         </div>
+                        <div class="progress-text">3% Complete</div>
                     </div>
                     <div class="company-name">
                         <div class="header-lumon-logo"></div>
@@ -72,9 +72,12 @@
                 </div>
             </div>
 
-            <div class="grid-border-line"></div>
-            <div id="number-grid" class="number-grid"></div>
-            <div class="grid-border-line"></div>
+            <!-- Grid section with border lines -->
+            <div class="grid-section">
+                <div class="grid-border-line top-line"></div>
+                <div id="number-grid" class="number-grid"></div>
+                <div class="grid-border-line bottom-line"></div>
+            </div>
 
             <div class="hex-codes-container">
                 <div class="hex-codes">

@@ -243,6 +243,21 @@ body {
     opacity: 0.8;
 }
 
+/* Grid Section */
+.grid-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 5;
+}
+
+.grid-section .top-line,
+.grid-section .bottom-line {
+    flex: 0 0 auto;
+}
+
 /* Number Grid */
 .number-grid {
     display: flex;
@@ -254,6 +269,7 @@ body {
     touch-action: manipulation;
     padding: 5px;
     z-index: 10;
+    flex: 0 0 auto; /* Prevent flex stretching */
 }
 
 .grid-container-inner {
@@ -436,6 +452,8 @@ body {
     margin: 10px 0;
     position: relative;
     z-index: 5;
+    flex: 0 0 auto; /* Prevent flex stretching */
+    display: block; /* Ensure it's a block element */
 }
 
 /* Mobile Responsive Styles */
@@ -501,12 +519,23 @@ body {
         gap: 6px;
     }
     
-    /* Ensure grid border lines are properly positioned */
+    /* Grid section on mobile */
+    .grid-section {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        flex: 0 0 auto;
+        margin-bottom: 10px;
+    }
+    
+    /* Fix grid border lines on mobile */
     .grid-border-line {
-        position: relative;
-        z-index: 5;
         margin: 5px 0;
         flex: 0 0 auto;
+        display: block;
+        height: 1px; /* Ensure it's just 1px tall */
+        width: 100%;
+        clear: both; /* Ensure it doesn't float with other elements */
     }
     
     /* Ensure the hex codes container is below the grid */
@@ -573,7 +602,7 @@ body {
         display: none;
         flex-direction: column;
         height: 100%;
-        justify-content: space-between;
+        justify-content: flex-start; /* Changed from space-between */
     }
     
     #grid-screen.active {
@@ -583,6 +612,12 @@ body {
     /* Adjust bucket drop zone height */
     .bucket-drop-zone {
         height: 35px;
+    }
+    
+    /* Make sure the buckets are at the bottom */
+    .buckets {
+        margin-top: auto;
+        padding-top: 10px;
     }
 }
 
