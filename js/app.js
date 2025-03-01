@@ -1760,27 +1760,55 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Find and pause the background music player if it's playing
         const pauseBackgroundMusic = () => {
-            // Try to find the audio element
-            const backgroundAudio = document.querySelector('audio#background-music');
-            if (backgroundAudio && !backgroundAudio.paused) {
+            // Try multiple ways to find the audio element
+            const backgroundAudio = document.querySelector('audio#background-music') || 
+                                   document.querySelector('audio') ||
+                                   document.getElementById('background-music');
+            
+            console.log('Found audio element:', backgroundAudio);
+            
+            if (backgroundAudio) {
                 // Store the current state to potentially resume later
                 const wasPlaying = !backgroundAudio.paused;
-                backgroundAudio.pause();
                 
-                // Update the play/pause button if it exists
-                const playPauseBtn = document.querySelector('.play-pause-btn');
-                if (playPauseBtn) {
-                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                try {
+                    // Force pause the audio
+                    backgroundAudio.pause();
+                    backgroundAudio.currentTime = backgroundAudio.currentTime;
+                    
+                    // Update the play/pause button if it exists
+                    const playPauseBtn = document.querySelector('.play-pause-btn');
+                    if (playPauseBtn) {
+                        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    }
+                    
+                    console.log('Background music paused successfully');
+                } catch (e) {
+                    console.error('Error pausing background music:', e);
                 }
                 
-                console.log('Background music paused');
                 return wasPlaying;
+            } else {
+                // Try to find the audio player in the slide-out player
+                const slideOutPlayer = document.querySelector('.slide-out-player');
+                if (slideOutPlayer) {
+                    const playPauseBtn = slideOutPlayer.querySelector('.play-pause-btn');
+                    if (playPauseBtn) {
+                        // Simulate a click on the pause button
+                        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                        console.log('Updated play button state');
+                    }
+                }
+                
+                console.log('No background audio element found to pause');
+                return false;
             }
-            return false;
         };
         
         // Pause any currently playing background music
+        console.log('Attempting to pause background music...');
         const backgroundMusicWasPlaying = pauseBackgroundMusic();
+        console.log('Background music was playing:', backgroundMusicWasPlaying);
         
         // Create and play the congratulatory sound
         const completionSound = new Audio();
