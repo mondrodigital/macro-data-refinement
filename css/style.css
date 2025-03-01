@@ -594,336 +594,179 @@ body {
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
     .app-container {
-        height: 100vh;
+        height: 100%;
+        min-height: 100vh;
         max-height: none;
         border-width: 1px;
-        padding: 10px 10px 80px; /* Increased bottom padding */
+        padding: 10px 10px 80px;
         overflow: hidden;
         display: flex;
         flex-direction: column;
-        position: relative; /* Added for absolute positioning of buckets */
+        position: relative;
+        justify-content: flex-start;
     }
 
-    /* Ensure grid doesn't take too much space */
-    .number-grid {
-        height: calc(100vh - 250px); /* Adjust height to leave space for buckets */
-        min-height: 200px;
-        max-height: 350px;
-    }
-
-    /* Position buckets at the bottom with proper spacing */
-    .buckets {
-        position: absolute;
-        bottom: 15px;
-        left: 15px;
-        right: 15px;
-        padding: 0 5px 15px;
-        margin: 0;
-        gap: 8px;
-        background-color: #001824; /* Match app background */
-        z-index: 100;
-    }
-
-    .bucket {
-        max-width: none;
-        min-height: 75px; /* Ensure minimum height */
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-    }
-
-    .bucket-drop-zone {
-        height: 50px;
-        font-size: 1.1rem;
-    }
-
-    .bucket-progress {
-        font-size: 0.8rem;
-    }
-
-    .bucket-progress-bar {
-        height: 3px;
-    }
-
-    /* Adjust spacing for iPhone browser bar */
-    @supports (-webkit-touch-callout: none) {
-        .app-container {
-            padding-bottom: 100px; /* Extra padding for iOS */
-        }
-        
-        .buckets {
-            bottom: 25px; /* Move up slightly on iOS */
-        }
-    }
-
-    .header-text {
-        font-size: 1.5rem;
-        margin: 5px 0 10px;
-    }
-    
-    .grid-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-    
-    .grid-button {
-        padding: 10px;
-        font-size: 1rem;
-    }
-    
     .status-bar {
-        flex-direction: row;
-        align-items: center;
         padding: 5px 0;
-        margin-bottom: 10px;
-    }
-    
-    .project-name {
-        font-size: 1.2rem;
-    }
-    
-    .progress-info {
-        gap: 10px;
-    }
-    
-    .total-progress-bar {
-        height: 35px;
-    }
-    
-    .progress-text {
-        font-size: 1.2rem;
-    }
-    
-    .header-lumon-logo {
-        width: 50px;
-        height: 50px;
-    }
-    
-    .grid-container-inner {
-        grid-template-columns: repeat(10, 1fr);
-        gap: 6px;
-    }
-    
-    /* Grid section on mobile */
-    .grid-section {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        flex: 0 0 auto;
-        margin-bottom: 10px;
-        position: relative;
-    }
-    
-    /* Fix grid border lines on mobile */
-    .grid-border-line {
-        margin: 5px 0;
-        flex: 0 0 auto;
-        display: block;
-        height: 1px; /* Ensure it's just 1px tall */
-        width: 100%;
-        clear: both; /* Ensure it doesn't float with other elements */
-        position: relative;
-        z-index: 15; /* Higher z-index to ensure it's above the grid */
-    }
-    
-    .grid-border-line.top-line {
-        margin-bottom: 0;
-    }
-    
-    .grid-border-line.bottom-line {
-        margin-top: 0;
-    }
-    
-    /* Hide hex codes on mobile */
-    .hex-codes-container {
-        display: none;
-    }
-    
-    .hex-codes {
-        font-size: 0.8rem;
-        margin: 3px 0;
-    }
-    
-    .number-cell {
-        font-size: 1rem;
-        height: 28px;
-        width: 28px;
-    }
-    
-    .screen {
-        display: none;
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-        -webkit-overflow-scrolling: touch;
-        flex-direction: column;
-    }
-    
-    .screen.active {
-        display: flex;
-        animation: fadeIn 1s ease-in-out;
-    }
-    
-    /* Hide music player elements on mobile */
-    .floating-music-btn,
-    .slide-out-player {
-        display: none !important;
-    }
-    
-    /* Ensure grid screen uses full height but doesn't scroll */
-    #grid-screen {
-        display: none;
-        flex-direction: column;
-        height: 100%;
-        justify-content: flex-start; /* Changed from space-between */
-    }
-    
-    #grid-screen.active {
-        display: flex;
-    }
-}
-
-@media (max-width: 480px) {
-    .app-container {
-        padding-bottom: 90px;
-    }
-
-    .number-grid {
-        height: calc(100vh - 220px);
-        min-height: 180px;
-    }
-
-    .bucket {
-        min-height: 65px;
-    }
-
-    .bucket-drop-zone {
-        height: 45px;
-        font-size: 1rem;
-    }
-
-    .bucket-progress {
-        font-size: 0.7rem;
-    }
-
-    .bucket-progress-bar {
-        height: 2px;
-    }
-
-    .header-text {
-        font-size: 1.3rem;
-        margin: 5px 0 8px;
-    }
-    
-    .grid-container {
-        width: 100%;
-    }
-    
-    .bucket {
-        width: 18%;
-        height: 55px;
-    }
-    
-    .grid-container-inner {
-        grid-template-columns: repeat(8, 1fr);
-        gap: 4px;
-    }
-    
-    .number-cell {
-        height: 24px;
-        width: 24px;
-        font-size: 0.9rem;
-    }
-    
-    .number-cell.hover-effect {
-        transform: scale(2.2);
-        transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    
-    .number-cell.ripple-effect-1 {
-        transform: scale(var(--dynamic-scale, 1.6));
-        transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    
-    .number-cell.ripple-effect-2 {
-        transform: scale(var(--dynamic-scale, 1.3));
-        transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
-    }
-    
-    .number-cell.selected {
-        transform: scale(1.7);
-    }
-    
-    .status-bar {
-        margin-bottom: 3px;
-    }
-    
-    .bucket-label {
-        font-size: 0.8rem;
-    }
-    
-    .hex-codes {
-        font-size: 0.7rem;
+        margin-bottom: 5px;
+        transform: scale(0.9);
+        transform-origin: top center;
     }
 
     .total-progress-bar {
         height: 30px;
     }
 
-    .project-name {
-        font-size: 1rem;
-        left: 10px;
-    }
-
-    .progress-text {
+    .project-name, .progress-text {
         font-size: 1rem;
     }
 
     .header-lumon-logo {
         width: 40px;
         height: 40px;
-        margin-left: 10px;
-    }
-}
-
-/* Smaller screens */
-@media (max-width: 360px) {
-    .app-container {
-        padding-bottom: 100px;
     }
 
+    /* Ensure grid doesn't take too much space */
     .number-grid {
-        height: calc(100vh - 200px);
-        min-height: 160px;
-    }
-
-    .bucket {
-        min-height: 60px;
+        height: auto;
+        min-height: 200px;
+        max-height: none;
+        aspect-ratio: 1.2/1;
+        margin: 5px 0;
     }
 
     .grid-container-inner {
-        grid-template-columns: repeat(7, 1fr);
+        grid-template-columns: repeat(8, 1fr);
+        gap: 4px;
+    }
+
+    .number-cell {
+        font-size: 0.9rem;
+        height: auto;
+        aspect-ratio: 1/1;
+        width: auto;
+    }
+
+    /* Position buckets at the bottom with proper spacing */
+    .buckets {
+        position: fixed;
+        bottom: 15px;
+        left: 15px;
+        right: 15px;
+        padding: 0 5px 15px;
+        margin: 0;
+        gap: 8px;
+        background-color: #001824;
+        z-index: 100;
+    }
+
+    .bucket {
+        max-width: none;
+        min-height: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .bucket-drop-zone {
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    /* Adjust spacing for iPhone browser bar */
+    @supports (-webkit-touch-callout: none) {
+        .app-container {
+            padding-bottom: 100px;
+            min-height: -webkit-fill-available;
+        }
+        
+        .buckets {
+            bottom: 25px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .app-container {
+        padding: 5px 5px 70px;
+    }
+
+    .status-bar {
+        transform: scale(0.85);
+    }
+
+    .number-grid {
+        aspect-ratio: 1/1;
+    }
+
+    .grid-container-inner {
+        grid-template-columns: repeat(8, 1fr);
         gap: 3px;
     }
-    
+
     .number-cell {
-        height: 22px;
-        width: 22px;
         font-size: 0.85rem;
     }
-    
+
     .bucket {
-        width: 18%;
-        height: 50px;
+        min-height: 50px;
     }
-    
-    .bucket-label {
-        font-size: 0.75rem;
+
+    .bucket-drop-zone {
+        height: 35px;
+        font-size: 0.9rem;
     }
-    
-    .header-text {
-        font-size: 1.2rem;
-        margin: 3px 0 6px;
+
+    .bucket-progress {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-height: 700px) {
+    .status-bar {
+        transform: scale(0.8);
+        margin-bottom: 2px;
+    }
+
+    .number-grid {
+        aspect-ratio: 1.4/1;
+    }
+
+    .bucket {
+        min-height: 45px;
+    }
+
+    .bucket-drop-zone {
+        height: 32px;
+    }
+}
+
+@media (max-height: 600px) {
+    .app-container {
+        padding: 2px 5px 60px;
+    }
+
+    .status-bar {
+        transform: scale(0.75);
+        margin-bottom: 0;
+    }
+
+    .number-grid {
+        aspect-ratio: 1.6/1;
+        margin: 2px 0;
+    }
+
+    .grid-container-inner {
+        gap: 2px;
+    }
+
+    .bucket {
+        min-height: 40px;
+    }
+
+    .bucket-drop-zone {
+        height: 28px;
+        font-size: 0.8rem;
     }
 }
 
