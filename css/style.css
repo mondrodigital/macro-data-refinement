@@ -645,12 +645,15 @@ body {
     /* Make grid fill entire screen */
     .number-grid {
         height: auto;
-        flex: 1;
+        flex: 1 1 auto;
+        display: flex;
         min-height: 0;
-        margin: 1px 0;
-        padding: 1px;
+        margin: 0;
+        padding: 0;
         overflow: hidden;
         width: 100%;
+        align-items: stretch;
+        justify-content: stretch;
     }
 
     .grid-container-inner {
@@ -658,13 +661,16 @@ body {
         gap: 5px;
         height: 100%;
         width: 100%;
+        min-height: 0;
+        flex: 1;
+        align-self: stretch;
     }
 
     .number-cell {
         font-size: 1rem;
-        height: auto;
+        height: 100%;
         aspect-ratio: 1/1;
-        width: auto;
+        width: 100%;
     }
 
     /* Position buckets at the bottom */
@@ -739,17 +745,20 @@ body {
     
     /* Improve grid layout - modify grid to fill space */
     .grid-section {
-        flex: 1;
+        flex: 1 1 auto;
         display: flex;
         flex-direction: column;
         margin: 0;
         padding: 0;
         width: 100%;
+        min-height: 0;
+        height: auto;
     }
     
     .number-grid .grid-container-inner {
         height: 100%;
         max-height: none;
+        display: grid;
     }
     
     /* Fix countries and filename screens */
@@ -757,6 +766,9 @@ body {
         width: 100%;
         max-width: 100%;
         overflow-x: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
     
     .grid-container {
@@ -772,6 +784,27 @@ body {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+    }
+    
+    /* Fix screen content to fill entire viewport */
+    #grid-screen.active {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .screen.active > * {
+        flex-shrink: 0;
+    }
+    
+    .screen.active .grid-section {
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+    
+    /* Remove any fixed heights that could limit expansion */
+    .number-grid {
+        height: auto;
     }
 }
 
