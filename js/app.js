@@ -908,12 +908,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Hex code animation
     function startHexCodeAnimation() {
+        // Don't start hex code animation on mobile
+        if (state.isMobile) {
+            return;
+        }
+        
         setInterval(() => {
             updateHexCodes();
         }, 8000); // Slower update interval
     }
 
     function updateHexCodes() {
+        // Skip updating hex codes on mobile
+        if (state.isMobile) {
+            return;
+        }
+        
         // Generate random hex codes
         const randomHex1 = 'x' + Math.floor(Math.random() * 100000).toString().padStart(5, '0');
         const randomHex2 = 'x' + Math.floor(Math.random() * 100000).toString().padStart(5, '0');

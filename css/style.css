@@ -550,11 +550,14 @@ body {
         margin-top: 0;
     }
     
-    /* Ensure the hex codes container is below the grid */
+    /* Hide hex codes on mobile */
     .hex-codes-container {
-        position: relative;
-        z-index: 5;
-        flex: 0 0 auto;
+        display: none;
+    }
+    
+    .hex-codes {
+        font-size: 0.8rem;
+        margin: 3px 0;
     }
     
     .number-cell {
@@ -596,11 +599,6 @@ body {
     .screen.active {
         display: flex;
         animation: fadeIn 1s ease-in-out;
-    }
-    
-    .hex-codes {
-        font-size: 0.8rem;
-        margin: 3px 0;
     }
     
     /* Hide music player elements on mobile */
