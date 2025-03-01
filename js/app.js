@@ -269,54 +269,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
-                const number = Math.floor(Math.random() * 10);
-                const cell = document.createElement('div');
-                cell.className = 'number-cell';
-                cell.textContent = number;
-                cell.dataset.row = i;
-                cell.dataset.col = j;
-                cell.dataset.value = number;
-                
-                // Add random wiggle animation properties
-                setWiggleProperties(cell);
-
-                if (state.isMobile) {
-                    // Mobile: Use click/touch to select
-                    cell.addEventListener('click', () => {
-                        handleNumberSelection(cell);
-                    });
-                    
-                    cell.addEventListener('touchstart', (e) => {
-                        if (state.currentScreen === 'grid-screen') {
-                            e.preventDefault();
-                        }
-                        handleNumberSelection(cell);
-                    }, { passive: false });
-                } else {
-                    // Desktop: Use click to select and hover for magnifying effect
-                    cell.addEventListener('click', () => {
-                        handleNumberSelection(cell);
-                    });
-                    
-                    // Add hover effect for magnifying glass
-                    cell.addEventListener('mouseenter', () => {
-                        handleNumberHover(cell);
-                        playHoverSound();
-                    });
-                    
-                    cell.addEventListener('mouseleave', () => {
-                        if (!state.mouseDown) {
-                            handleNumberUnhover(cell);
-                        }
-                    });
-                }
-
-                elements.numberGrid.appendChild(cell);
+                createNumberCell(i, j);
             }
         }
 
         // Clear selected numbers
         state.selectedNumbers = [];
+    }
+    
+    // Function to create a single number cell
+    function createNumberCell(row, col) {
+        const number = Math.floor(Math.random() * 10);
+        const cell = document.createElement('div');
+        cell.className = 'number-cell';
+        cell.textContent = number;
+        cell.dataset.row = row;
+        cell.dataset.col = col;
+        cell.dataset.value = number;
+        
+        // Add random wiggle animation properties
+        setWiggleProperties(cell);
+
+        if (state.isMobile) {
+            // Mobile: Use click/touch to select
+            cell.addEventListener('click', () => {
+                handleNumberSelection(cell);
+            });
+            
+            cell.addEventListener('touchstart', (e) => {
+                if (state.currentScreen === 'grid-screen') {
+                    e.preventDefault();
+                }
+                handleNumberSelection(cell);
+            }, { passive: false });
+        } else {
+            // Desktop: Use click to select and hover for magnifying effect
+            cell.addEventListener('click', () => {
+                handleNumberSelection(cell);
+            });
+            
+            // Add hover effect for magnifying glass
+            cell.addEventListener('mouseenter', () => {
+                handleNumberHover(cell);
+                playHoverSound();
+            });
+            
+            cell.addEventListener('mouseleave', () => {
+                if (!state.mouseDown) {
+                    handleNumberUnhover(cell);
+                }
+            });
+        }
+
+        elements.numberGrid.appendChild(cell);
+        return cell;
     }
     
     function setWiggleProperties(cell) {
@@ -663,7 +669,10 @@ document.addEventListener('DOMContentLoaded', () => {
             bucketElement.classList.remove('highlight');
         }, 300);
         
-        // Animate each number to the bucket with a delay based on index
+        // Track how many animations have completed
+        let completedAnimations = 0;
+        
+        // Animate each number to fall off the page
         numbersCopy.forEach((num, index) => {
             // Create an animated number element
             const animatedNumber = document.createElement('div');
@@ -678,20 +687,22 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add it to the body
             document.body.appendChild(animatedNumber);
             
-            // Animate it to the bucket with a delay based on index
+            // Make the original number invisible
+            num.element.style.opacity = '0';
+            
+            // Animate it falling off the page
             setTimeout(() => {
                 animatedNumber.style.transition = 'all 0.5s ease-in-out';
-                animatedNumber.style.left = `${bucketCenterX}px`;
-                animatedNumber.style.top = `${bucketCenterY}px`;
+                animatedNumber.style.top = `${window.innerHeight + 100}px`; // Fall below the screen
                 animatedNumber.style.opacity = '0';
-                animatedNumber.style.transform = 'scale(0.5)';
                 
                 // Remove the animated number after animation
                 setTimeout(() => {
                     animatedNumber.remove();
+                    completedAnimations++;
                     
                     // If this is the last number, process the drop
-                    if (index === numbersCopy.length - 1) {
+                    if (completedAnimations === numbersCopy.length) {
                         processDrop(bucketId);
                     }
                 }, 500);
@@ -725,6 +736,22 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hide the keyboard shortcut hint
         hideKeyboardShortcutHint();
         
+        // Replace the empty cells with new numbers
+        state.selectedNumbers.forEach(num => {
+            // Find the cell position
+            const row = parseInt(num.row);
+            const col = parseInt(num.col);
+            
+            // Create a new cell at the same position
+            const newCell = createNumberCell(row, col);
+            
+            // Add a fade-in effect
+            newCell.style.opacity = '0';
+            setTimeout(() => {
+                newCell.style.opacity = '1';
+            }, 100);
+        });
+        
         // Clear selected numbers
         state.selectedNumbers = [];
         
@@ -740,9 +767,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Flash the screen briefly
         flashScreen();
-        
-        // Generate new numbers
-        generateNumberGrid();
     }
 
     function updateUI() {
