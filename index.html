@@ -4,10 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Macro Data Refinement</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=2">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <meta name="description" content="A web application that simulates the macro data refinement work from the TV show Severance">
     <meta name="keywords" content="severance, macro, data, refinement, simulator">
+    <script>
+        console.log('Testing basic script execution v3 - updated version with service worker unregister');
+        
+        // Unregister any existing service worker
+        if ('serviceWorker' in navigator) {
+            console.log('Attempting to unregister service worker...');
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                    console.log('Service worker unregistered');
+                }
+            });
+        }
+        
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded - updated version');
+            document.body.style.opacity = '1';
+            console.log('CSS loaded:', getComputedStyle(document.querySelector('.status-bar')).flexDirection);
+        });
+    </script>
 </head>
 <body>
     <div class="app-container">
